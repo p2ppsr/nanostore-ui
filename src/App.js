@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import boomerang from '@cwi/boomerang'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
 import Babbage from '@babbage/sdk'
@@ -67,7 +66,7 @@ export default () => {
       if (!hostingMinutes) {
         throw new Error('Specify how long to host the file!')
       }
-      const invoice = await boomerang('POST', `${serverURL}/invoice`, {
+      const { data: invoice } = await post(`${serverURL}/invoice`, {
         fileSize: file.size,
         retentionPeriod: hostingMinutes
       })
