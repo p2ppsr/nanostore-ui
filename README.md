@@ -1,6 +1,6 @@
-# Hashbrown UI
+# Nanostore UI
 
-UI for Hashbrown Interactions
+Upload and Download Content
 
 ## Confidentiality
 

@@ -4,7 +4,8 @@ import {
   Button,
   Typography,
   Tabs,
-  Tab
+  Tab,
+  LinearProgress
 } from '@material-ui/core'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -12,8 +13,7 @@ import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
 import Babbage from '@babbage/sdk'
 import { post } from 'axios'
-import parapet from 'parapet-js'
-import { getHashFromURL } from 'uhrp-url'
+import { download } from 'nanoseek'
 
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
@@ -24,41 +24,35 @@ export default () => {
   const [tabIndex, setTabIndex] = useState(1)
   const [downloadURL, setDownloadURL] = useState('')
   const [serverURL, setServerURL] = useState(
-    'https://hashbrown.babbage.systems'
+    process.env.NODe_ENV !== 'production'
+      ? 'https://staging-nanostore.babbage.systems'
+      : 'https://nanostore.babbage.systems'
   )
   const [hostingMinutes, setHostingMinutes] = useState(60)
   const [file, setFile] = useState(null)
-  const [resultTXID, setResultTXID] = useState('')
+  const [results, setResults] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const download = async e => {
+  const handleDownload = async e => {
     e.preventDefault()
-    const hash = getHashFromURL(downloadURL).toString('hex')
-    const resolved = await parapet({
-      bridge: '1AJsUZ7MsJGwmkCZSoDpro28R52ptvGma7',
-      request: {
-        type: 'json-query',
-        query: {
-          v: 3,
-          q: {
-            collection: 'content',
-            find: {
-              hash,
-              revoked: false
-            }
-          }
-        }
-      }
-    })
-    if (resolved.length > 0) {
-      const urls = resolved.map(x => x.URL)
-      alert(`You can download it from:\n\n${JSON.stringify(urls)}`)
-    } else {
-      toast.error('No Hashbrown host advertises this hash!')
+    setLoading(true)
+    try {
+      const { mimeType, data } = await download({ URL: downloadURL })
+      const blob = new Blob([data], { type: mimeType })
+      const link = document.createElement('a')
+      link.href = window.URL.createObjectURL(blob)
+      link.download = downloadURL
+      link.click()
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const upload = async e => {
+  const handleUpload = async e => {
     e.preventDefault()
+    setLoading(true)
     try {
       if (!file) {
         throw new Error('Choose a file to upload!')
@@ -75,11 +69,15 @@ export default () => {
       }
       console.log(invoice)
 
-      const tx = await Babbage.ninja.getTransactionWithOutputs({
+      const tx = await Babbage.createAction({
         outputs: invoice.outputs.map(x => ({
           satoshis: x.amount,
           script: x.outputScript
-        }))
+        })),
+        keyName: 'primarySigning',
+        keyPath: 'm/1033/1',
+        description: 'Upload with NanoStore',
+        labels: ['nanostore']
       })
       console.log(tx)
 
@@ -87,8 +85,7 @@ export default () => {
       const data = new window.FormData()
       data.append('file', file)
       data.append('referenceNumber', invoice.referenceNumber)
-      data.append('transactionHex', tx.hex)
-      console.log(data)
+      data.append('transactionHex', tx.rawTransaction)
 
       const config = {
         headers: {
@@ -99,19 +96,15 @@ export default () => {
       const { data: response } = await post(`${serverURL}/upload`, data, config)
       console.log(response)
 
-      const txid = await Babbage.ninja.processOutgoingTransaction({
-        submittedTransaction: tx.hex,
-        reference: tx.reference,
-        note: 'Upload a file with Hashbrown UI'
+      setResults({
+        txid: tx.txid,
+        hash: response.hash,
+        publicURL: response.publicURL
       })
-      console.log(txid)
-
-      setResultTXID(txid.note)
-      window.alert(
-        `Broadcasted! TXID:${txid}\n\nUHRP URL: ${response.hash}\n\nPublic URL: ${response.publicURL}`
-      )
     } catch (e) {
       toast.error(e.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -127,9 +120,9 @@ export default () => {
     <div className={classes.content_wrap}>
       <ToastContainer />
       <center>
-        <Typography variant='h4'>Hashbrown UI</Typography>
+        <Typography variant='h4'>NanoStore UI</Typography>
         <Typography color='textSecondary' paragraph>
-          UI for Hashbrown Interactions
+          Upload and Download Content
         </Typography>
         <Tabs
           onChange={(e, v) => setTabIndex(v)}
@@ -144,7 +137,7 @@ export default () => {
         </Tabs>
       </center>
       {tabIndex === 0 && (
-        <form onSubmit={download}>
+        <form onSubmit={handleDownload}>
           <center>
             <br />
             <br />
@@ -164,11 +157,14 @@ export default () => {
             >
               Download
             </Button>
+            <br />
+            <br />
+            {loading && <LinearProgress />}
           </center>
         </form>
       )}
       {tabIndex === 1 && (
-        <form onSubmit={upload}>
+        <form onSubmit={handleUpload}>
           <br />
           <br />
           <Typography variant='h5'>Server URL</Typography>
@@ -211,11 +207,29 @@ export default () => {
               color='primary'
               size='large'
               type='submit'
+              disabled={loading}
             >
               Upload
             </Button>
-            {resultTXID && (
-              <Typography>Success! TXID: {resultTXID}</Typography>
+            <br />
+            <br />
+            {loading && <LinearProgress />}
+            {results && (
+              <div>
+                <Typography variant='h4'>Success!</Typography>
+                <Typography><b>TXID:</b>{' '}{results.txid}</Typography>
+                <Typography><b>UHRP URL:</b>{' '}{results.hash}</Typography>
+                <Typography>
+                  <b>Public URL:</b>{' '}
+                  <a
+                    href={results.publicURL}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    {results.publicURL}
+                  </a>
+                </Typography>
+              </div>
             )}
           </center>
         </form>
