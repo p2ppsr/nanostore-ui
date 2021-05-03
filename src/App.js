@@ -12,8 +12,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
 import Babbage from '@babbage/sdk'
-import { post } from 'axios'
 import { download } from 'nanoseek'
+import { invoice, upload } from 'nanostore-publisher'
 
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
@@ -60,17 +60,15 @@ export default () => {
       if (!hostingMinutes) {
         throw new Error('Specify how long to host the file!')
       }
-      const { data: invoice } = await post(`${serverURL}/invoice`, {
+      const inv = await invoice({
         fileSize: file.size,
-        retentionPeriod: hostingMinutes
+        retentionPeriod: hostingMinutes,
+        serverURL
       })
-      if (!invoice || !invoice.referenceNumber) {
-        throw new Error(invoice.description || 'Error creating invoice!')
-      }
-      console.log(invoice)
+      console.log(inv)
 
       const tx = await Babbage.createAction({
-        outputs: invoice.outputs.map(x => ({
+        outputs: inv.outputs.map(x => ({
           satoshis: x.amount,
           script: x.outputScript
         })),
@@ -81,20 +79,12 @@ export default () => {
       })
       console.log(tx)
 
-      // Upload and pay for the file
-      const data = new window.FormData()
-      data.append('file', file)
-      data.append('referenceNumber', invoice.referenceNumber)
-      data.append('transactionHex', tx.rawTransaction)
-
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data'
-        }
-      }
-
-      const { data: response } = await post(`${serverURL}/upload`, data, config)
-      console.log(response)
+      const response = await upload({
+        referenceNumber: inv.referenceNumber,
+        transactionHex: tx.rawTransaction,
+        file,
+        serverURL
+      })
 
       setResults({
         txid: tx.txid,
