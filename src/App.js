@@ -24,9 +24,7 @@ export default () => {
   const [tabIndex, setTabIndex] = useState(1)
   const [downloadURL, setDownloadURL] = useState('')
   const [serverURL, setServerURL] = useState(
-    process.env.NODe_ENV !== 'production'
-      ? 'https://staging-nanostore.babbage.systems'
-      : 'https://nanostore.babbage.systems'
+    'https://nanostore.babbage.systems'
   )
   const [hostingMinutes, setHostingMinutes] = useState(60)
   const [file, setFile] = useState(null)
