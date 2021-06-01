@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import {
   TextField,
+  Select,
+  MenuItem,
   Button,
   Typography,
   Tabs,
@@ -29,6 +31,7 @@ export default () => {
   const [hostingMinutes, setHostingMinutes] = useState(60)
   const [file, setFile] = useState(null)
   const [results, setResults] = useState('')
+  const [actionTXID, setActionTXID] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleDownload = async e => {
@@ -63,7 +66,6 @@ export default () => {
         retentionPeriod: hostingMinutes,
         serverURL
       })
-      console.log(inv)
 
       const tx = await Babbage.createAction({
         outputs: inv.outputs.map(x => ({
@@ -75,7 +77,7 @@ export default () => {
         description: 'Upload with NanoStore',
         labels: ['nanostore']
       })
-      console.log(tx)
+      setActionTXID(tx.txid)
 
       const response = await upload({
         referenceNumber: inv.referenceNumber,
@@ -83,9 +85,10 @@ export default () => {
         file,
         serverURL
       })
+      console.log(response)
 
       setResults({
-        txid: tx.txid,
+        txid: response.txid,
         hash: response.hash,
         publicURL: response.publicURL
       })
@@ -157,7 +160,7 @@ export default () => {
           <br />
           <Typography variant='h5'>Server URL</Typography>
           <Typography paragraph>
-            Enter the URL of the Hashbrown server to interact with
+            Enter the URL of the NanoStore server to interact with
           </Typography>
           <TextField
             fullWidth
@@ -169,22 +172,33 @@ export default () => {
           <br />
           <br />
           <Typography variant='h5'>Hosting Duration</Typography>
-          <Typography paragraph>
-            Enter the number of minutes to host the file (only whole numbers)
-          </Typography>
-          <TextField
-            fullWidth
-            variant='outlined'
-            type='number'
-            label='Hosting Minutes'
-            value={hostingMinutes}
+          <Select
             onChange={e => setHostingMinutes(e.target.value)}
-          />
+            value={hostingMinutes}
+            variant='outlined'
+            size='large'
+            fullWidth
+          >
+            <MenuItem value={60}>1 Hour</MenuItem>
+            <MenuItem value={1440}>1 Day</MenuItem>
+            <MenuItem value={1440 * 7}>1 Week</MenuItem>
+            <MenuItem value={1440 * 30}>1 Month</MenuItem>
+            <MenuItem value={1440 * 90}>3 Months</MenuItem>
+            <MenuItem value={1440 * 180}>6 Months</MenuItem>
+            <MenuItem value={525600}>1 Year</MenuItem>
+            <MenuItem value={525600 * 2}>2 Years</MenuItem>
+            <MenuItem value={525600 * 5}>5 Years</MenuItem>
+            <MenuItem value={525600 * 10}>10 Years</MenuItem>
+            <MenuItem value={525600 * 20}>20 Years</MenuItem>
+            <MenuItem value={525600 * 30}>30 Years</MenuItem>
+            <MenuItem value={525600 * 50}>50 Years</MenuItem>
+            <MenuItem value={525600 * 100}>100 Years</MenuItem>
+          </Select>
           <br />
           <br />
           <Typography variant='h5'>File to Host</Typography>
-          <Typography paragraph>
-            Choose the file that you want the Hashbrown server to host
+          <Typography>
+            Choose the file that you want the NanoStore server to host
           </Typography>
           <input type='file' name='file' onChange={handleFileChange} />
           <br />
@@ -205,10 +219,11 @@ export default () => {
             {results && (
               <div>
                 <Typography variant='h4'>Success!</Typography>
-                <Typography><b>TXID:</b>{' '}{results.txid}</Typography>
-                <Typography><b>UHRP URL:</b>{' '}{results.hash}</Typography>
+                <Typography><b>UHRP Commitment TXID:</b>{' '}{results.txid}</Typography>
+                <Typography><b>Payment TXID:</b>{' '}{actionTXID}</Typography>
+                <Typography><b>UHRP URL (can never change, works with all nodes):</b>{' '}{results.hash}</Typography>
                 <Typography>
-                  <b>Public URL:</b>{' '}
+                  <b>Legacy HTTPS URL (only for this node and commitment, may expire):</b>{' '}
                   <a
                     href={results.publicURL}
                     target='_blank'
@@ -222,6 +237,9 @@ export default () => {
           </center>
         </form>
       )}
+      <Typography align='center'>
+        Check out the <a href='https://bridgeport.babbage.systems/1AJsUZ7MsJGwmkCZSoDpro28R52ptvGma7'>Universal Hash Resolution Protocol</a>!
+      </Typography>
     </div>
   )
 }
