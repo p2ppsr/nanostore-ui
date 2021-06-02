@@ -16,6 +16,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Babbage from '@babbage/sdk'
 import { download } from 'nanoseek'
 import { invoice, upload } from 'nanostore-publisher'
+import Upload from '@material-ui/icons/CloudUpload'
+import Download from '@material-ui/icons/GetApp'
 
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
@@ -28,7 +30,7 @@ export default () => {
   const [serverURL, setServerURL] = useState(
     'https://nanostore.babbage.systems'
   )
-  const [hostingMinutes, setHostingMinutes] = useState(60)
+  const [hostingMinutes, setHostingMinutes] = useState(180)
   const [file, setFile] = useState(null)
   const [results, setResults] = useState('')
   const [actionTXID, setActionTXID] = useState('')
@@ -36,6 +38,8 @@ export default () => {
 
   const handleDownload = async e => {
     e.preventDefault()
+    setResults('')
+    setActionTXID('')
     setLoading(true)
     try {
       const { mimeType, data } = await download({ URL: downloadURL })
@@ -85,15 +89,18 @@ export default () => {
         file,
         serverURL
       })
-      console.log(response)
 
       setResults({
-        txid: response.txid,
         hash: response.hash,
         publicURL: response.publicURL
       })
     } catch (e) {
-      toast.error(e.message)
+      console.error(e)
+      if (e.response && e.response.data && e.response.data.description) {
+        toast.error(e.response.data.description)
+      } else {
+        toast.error(e.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -145,6 +152,7 @@ export default () => {
               variant='contained'
               color='primary'
               type='submit'
+              startIcon={<Download />}
             >
               Download
             </Button>
@@ -172,6 +180,7 @@ export default () => {
           <br />
           <br />
           <Typography variant='h5'>Hosting Duration</Typography>
+          <Typography paragraph>Longer hosting contracts cost more</Typography>
           <Select
             onChange={e => setHostingMinutes(e.target.value)}
             value={hostingMinutes}
@@ -179,7 +188,7 @@ export default () => {
             size='large'
             fullWidth
           >
-            <MenuItem value={60}>1 Hour</MenuItem>
+            <MenuItem value={180}>3 Hours</MenuItem>
             <MenuItem value={1440}>1 Day</MenuItem>
             <MenuItem value={1440 * 7}>1 Week</MenuItem>
             <MenuItem value={1440 * 30}>1 Month</MenuItem>
@@ -197,7 +206,7 @@ export default () => {
           <br />
           <br />
           <Typography variant='h5'>File to Host</Typography>
-          <Typography>
+          <Typography paragraph>
             Choose the file that you want the NanoStore server to host
           </Typography>
           <input type='file' name='file' onChange={handleFileChange} />
@@ -210,6 +219,7 @@ export default () => {
               size='large'
               type='submit'
               disabled={loading}
+              startIcon={<Upload />}
             >
               Upload
             </Button>
@@ -219,7 +229,6 @@ export default () => {
             {results && (
               <div>
                 <Typography variant='h4'>Success!</Typography>
-                <Typography><b>UHRP Commitment TXID:</b>{' '}{results.txid}</Typography>
                 <Typography><b>Payment TXID:</b>{' '}{actionTXID}</Typography>
                 <Typography><b>UHRP URL (can never change, works with all nodes):</b>{' '}{results.hash}</Typography>
                 <Typography>
@@ -237,8 +246,13 @@ export default () => {
           </center>
         </form>
       )}
-      <Typography align='center'>
+      <br />
+      <br />
+      <Typography align='center' paragraph>
         Check out the <a href='https://bridgeport.babbage.systems/1AJsUZ7MsJGwmkCZSoDpro28R52ptvGma7'>Universal Hash Resolution Protocol</a>!
+      </Typography>
+      <Typography align='center'>
+        <a href='https://projectbabbage.com'>www.ProjectBabbage.com</a>
       </Typography>
     </div>
   )
