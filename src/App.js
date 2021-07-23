@@ -81,12 +81,15 @@ export default () => {
         description: 'Upload with NanoStore',
         labels: ['nanostore']
       })
+      console.log(tx)
       setActionTXID(tx.txid)
 
       const response = await upload({
         referenceNumber: inv.referenceNumber,
-        transactionHex: tx.rawTransaction,
+        transactionHex: tx.rawTx,
         file,
+        inputs: tx.inputs,
+        mapiResponses: tx.mapiResponses,
         serverURL
       })
 
