@@ -35,6 +35,7 @@ export default () => {
   const [results, setResults] = useState('')
   const [actionTXID, setActionTXID] = useState('')
   const [loading, setLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
 
   const handleDownload = async e => {
     e.preventDefault()
@@ -90,7 +91,12 @@ export default () => {
         file,
         inputs: tx.inputs,
         mapiResponses: tx.mapiResponses,
-        serverURL
+        serverURL,
+        onUploadProgress: prog => {
+          setUploadProgress(
+            parseInt((prog.loaded / prog.total) * 100)
+          )
+        }
       })
 
       setResults({
@@ -106,6 +112,7 @@ export default () => {
       }
     } finally {
       setLoading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -213,6 +220,9 @@ export default () => {
             Choose the file that you want the NanoStore server to host
           </Typography>
           <input type='file' name='file' onChange={handleFileChange} />
+          <Typography paragraph>
+            Files are advertised <b>PUBLICLY</b>, please encrypt sensitive data before uploading.
+          </Typography>
           <br />
           <br />
           <center className={classes.broadcast_wrap}>
@@ -228,7 +238,12 @@ export default () => {
             </Button>
             <br />
             <br />
-            {loading && <LinearProgress />}
+            {loading && (
+              <LinearProgress
+                variant={uploadProgress === 0 ? 'indeterminate' : 'determinate'}
+                value={uploadProgress === 0 ? undefined : uploadProgress}
+              />
+            )}
             {results && (
               <div>
                 <Typography variant='h4'>Success!</Typography>
