@@ -28,7 +28,14 @@ export default () => {
   const [tabIndex, setTabIndex] = useState(1)
   const [downloadURL, setDownloadURL] = useState('')
   const [serverURL, setServerURL] = useState(
-    'https://nanostore.babbage.systems'
+    window.location.host.startsWith('localhost')
+      ? 'http://localhost:3104'
+      : 'https://nanostore.babbage.systems'
+  )
+  const [bridgeportResolver, setBridgeportResolver] = useState(
+    window.location.host.startsWith('localhost')
+      ? 'http://localhost:3103'
+      : 'https://bridgeport.babbage.systems'
   )
   const [hostingMinutes, setHostingMinutes] = useState(180)
   const [file, setFile] = useState(null)
@@ -43,7 +50,11 @@ export default () => {
     setActionTXID('')
     setLoading(true)
     try {
-      const { mimeType, data } = await download({ URL: downloadURL })
+      debugger
+      const { mimeType, data } = await download({
+        URL: downloadURL,
+        bridgeportResolvers: [bridgeportResolver]
+      })
       const blob = new Blob([data], { type: mimeType })
       const link = document.createElement('a')
       link.href = window.URL.createObjectURL(blob)
@@ -147,6 +158,15 @@ export default () => {
       {tabIndex === 0 && (
         <form onSubmit={handleDownload}>
           <center>
+            <br />
+            <br />
+            <TextField
+              variant='outlined'
+              label='Bridgeport Resolver URL'
+              onChange={e => setBridgeportResolver(e.target.value)}
+              value={bridgeportResolver}
+              fullWidth
+            />
             <br />
             <br />
             <TextField
