@@ -13,16 +13,15 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
-import Babbage from '@babbage/sdk'
+import { getPaymail } from '@babbage/sdk'
 import { download } from 'nanoseek'
-import { invoice, upload } from 'nanostore-publisher'
+import { invoice, pay, upload } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
 import Download from '@material-ui/icons/GetApp'
 
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
 })
-
 export default () => {
   const classes = useStyles()
   const [tabIndex, setTabIndex] = useState(1)
@@ -30,7 +29,9 @@ export default () => {
   const [serverURL, setServerURL] = useState(
     window.location.host.startsWith('localhost')
       ? 'http://localhost:3104'
-      : 'https://nanostore.babbage.systems'
+      : process.env.REACT_APP_IS_STAGING
+        ? 'https://staging-nanostore.babbage.systems'
+        : 'https://nanostore.babbage.systems'
   )
   const [bridgeportResolver, setBridgeportResolver] = useState(
     window.location.host.startsWith('localhost')
@@ -72,48 +73,103 @@ export default () => {
     setLoading(true)
     try {
       if (!file) {
-        throw new Error('Choose a file to upload!')
+        let e = new Error('Choose a file to upload!')
+        e.code = 'ERR_UI_FILE_MISSING'
+        throw e
       }
       if (!hostingMinutes) {
-        throw new Error('Specify how long to host the file!')
+        let e = new Error('Specify how long to host the file!')
+        e.code = 'ERR_UI_HOST_DURATION_MISSING'
+        throw e
       }
-      const inv = await invoice({
-        fileSize: file.size,
-        retentionPeriod: hostingMinutes,
-        serverURL
-      })
-
-      const tx = await Babbage.createAction({
-        outputs: inv.outputs.map(x => ({
-          satoshis: x.amount,
-          script: x.outputScript
-        })),
-        keyName: 'primarySigning',
-        keyPath: 'm/1033/1',
-        description: 'Upload with NanoStore',
-        labels: ['nanostore']
-      })
-      console.log(tx)
-      setActionTXID(tx.txid)
-
-      const response = await upload({
-        referenceNumber: inv.referenceNumber,
-        transactionHex: tx.rawTx,
-        file,
-        inputs: tx.inputs,
-        mapiResponses: tx.mapiResponses,
-        serverURL,
-        onUploadProgress: prog => {
-          setUploadProgress(
-            parseInt((prog.loaded / prog.total) * 100)
-          )
+      let invoiceResult
+      try {
+        invoiceResult = await invoice({
+          fileSize: file.size,
+          retentionPeriod: hostingMinutes,
+          serverURL
+        })
+        console.log('App():invoiceResult:', invoiceResult)
+        let payResult
+        try {
+          payResult = await pay({
+            sender: await getPaymail(),
+            recipient: invoiceResult.paymail,
+            amount: invoiceResult.amount,
+            description: 'Payment to nanostore account.',
+            orderID: invoiceResult.ORDER_ID
+          })
+          console.log('App():payResult:', payResult)
+          if( payResult.status === 'success' ) {
+            let responseResult
+            try {
+              responseResult = await upload({
+                uploadURL: payResult.uploadURL,
+                publicURL: invoiceResult.publicURL,
+                file,
+                serverURL,
+                onUploadProgress: prog => {
+                  setUploadProgress(
+                    parseInt((prog.loaded / prog.total) * 100)
+                  )
+                }
+              })
+              setResults({
+                hash: responseResult.hash,
+                publicURL: responseResult.publicURL
+              })
+            } catch (e) {
+              if( responseResult.status === 'success' ) {
+                if( !responseResult.hash ) {
+                  throw e  
+                }
+                if( !responseResult.publicURL ) {
+                  throw e  
+                }
+              }
+              else {
+                let e = new Error('Uploading file has failed.')
+                e.code = 'ERR_UPLOAD_FILE_FAILED'
+                throw e  
+              } 
+            }           
+          }
+        } catch (e) {
+          if( payResult.status === 'success' ) {
+            if( !payResult.uploadURL ) {
+              throw e  
+            }
+            if( !payResult.publicURL ) {
+              throw e  
+            }
+          }
+          else {
+            let e = new Error('Paying invoice has failed.')
+            e.code = 'ERR_PAY_INVOICE_FAILED'
+            throw e  
+          }
         }
-      })
-
-      setResults({
-        hash: response.hash,
-        publicURL: response.publicURL
-      })
+      } catch (e) {
+        if (invoiceResult.status === 'success') {
+          if( !invoiceResult.paymail ) {
+            throw e
+          }
+          if( !invoiceResult.amount ) {
+            throw e  
+          }
+          if( !invoiceResult.ORDER_ID ) {
+            throw e  
+          }
+          if( !invoiceResult.publicURL ) {
+            throw e  
+          }
+        }
+        else {
+          let e = new Error('Invoice creation has failed.')
+          e.code = 'ERR_INVOICE_CREATION_FAILED'
+          throw e  
+        }
+      }
     } catch (e) {
       console.error(e)
       if (e.response && e.response.data && e.response.data.description) {
