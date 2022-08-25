@@ -51,7 +51,6 @@ export default () => {
     setActionTXID('')
     setLoading(true)
     try {
-      debugger
       const { mimeType, data } = await download({
         URL: downloadURL,
         bridgeportResolvers: [bridgeportResolver]
@@ -73,12 +72,12 @@ export default () => {
     setLoading(true)
     try {
       if (!file) {
-        let e = new Error('Choose a file to upload!')
+        const e = new Error('Choose a file to upload!')
         e.code = 'ERR_UI_FILE_MISSING'
         throw e
       }
       if (!hostingMinutes) {
-        let e = new Error('Specify how long to host the file!')
+        const e = new Error('Specify how long to host the file!')
         e.code = 'ERR_UI_HOST_DURATION_MISSING'
         throw e
       }
@@ -100,7 +99,7 @@ export default () => {
             orderID: invoiceResult.ORDER_ID
           })
           console.log('App():payResult:', payResult)
-          if( payResult.status === 'success' ) {
+          if (payResult.status === 'success') {
             let responseResult
             try {
               responseResult = await upload({
@@ -119,55 +118,52 @@ export default () => {
                 publicURL: responseResult.publicURL
               })
             } catch (e) {
-              if( responseResult.status === 'success' ) {
-                if( !responseResult.hash ) {
-                  throw e  
+              if (responseResult.status === 'success') {
+                if (!responseResult.hash) {
+                  throw e
                 }
-                if( !responseResult.publicURL ) {
-                  throw e  
+                if (!responseResult.publicURL) {
+                  throw e
                 }
-              }
-              else {
-                let e = new Error('Uploading file has failed.')
+              } else {
+                const e = new Error('Uploading file has failed.')
                 e.code = 'ERR_UPLOAD_FILE_FAILED'
-                throw e  
-              } 
-            }           
+                throw e
+              }
+            }
           }
         } catch (e) {
-          if( payResult.status === 'success' ) {
-            if( !payResult.uploadURL ) {
-              throw e  
+          if (payResult.status === 'success') {
+            if (!payResult.uploadURL) {
+              throw e
             }
-            if( !payResult.publicURL ) {
-              throw e  
+            if (!payResult.publicURL) {
+              throw e
             }
-          }
-          else {
-            let e = new Error('Paying invoice has failed.')
+          } else {
+            const e = new Error('Paying invoice has failed.')
             e.code = 'ERR_PAY_INVOICE_FAILED'
-            throw e  
+            throw e
           }
         }
       } catch (e) {
         if (invoiceResult.status === 'success') {
-          if( !invoiceResult.paymail ) {
+          if (!invoiceResult.paymail) {
             throw e
           }
-          if( !invoiceResult.amount ) {
-            throw e  
+          if (!invoiceResult.amount) {
+            throw e
           }
-          if( !invoiceResult.ORDER_ID ) {
-            throw e  
+          if (!invoiceResult.ORDER_ID) {
+            throw e
           }
-          if( !invoiceResult.publicURL ) {
-            throw e  
+          if (!invoiceResult.publicURL) {
+            throw e
           }
-        }
-        else {
-          let e = new Error('Invoice creation has failed.')
+        } else {
+          const e = new Error('Invoice creation has failed.')
           e.code = 'ERR_INVOICE_CREATION_FAILED'
-          throw e  
+          throw e
         }
       }
     } catch (e) {
