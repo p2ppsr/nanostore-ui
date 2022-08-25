@@ -9,6 +9,7 @@ import {
   Tab,
   LinearProgress
 } from '@material-ui/core'
+import { Blob } from 'Blob'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
@@ -81,91 +82,50 @@ export default () => {
         e.code = 'ERR_UI_HOST_DURATION_MISSING'
         throw e
       }
-      let invoiceResult
-      try {
-        invoiceResult = await invoice({
-          fileSize: file.size,
-          retentionPeriod: hostingMinutes,
-          serverURL
-        })
-        console.log('App():invoiceResult:', invoiceResult)
-        let payResult
-        try {
-          payResult = await pay({
-            sender: await getPaymail(),
-            recipient: invoiceResult.paymail,
-            amount: invoiceResult.amount,
-            description: 'Payment to nanostore account.',
-            orderID: invoiceResult.ORDER_ID
-          })
-          console.log('App():payResult:', payResult)
-          if (payResult.status === 'success') {
-            let responseResult
-            try {
-              responseResult = await upload({
-                uploadURL: payResult.uploadURL,
-                publicURL: invoiceResult.publicURL,
-                file,
-                serverURL,
-                onUploadProgress: prog => {
-                  setUploadProgress(
-                    parseInt((prog.loaded / prog.total) * 100)
-                  )
-                }
-              })
-              setResults({
-                hash: responseResult.hash,
-                publicURL: responseResult.publicURL
-              })
-            } catch (e) {
-              if (responseResult.status === 'success') {
-                if (!responseResult.hash) {
-                  throw e
-                }
-                if (!responseResult.publicURL) {
-                  throw e
-                }
-              } else {
-                const e = new Error('Uploading file has failed.')
-                e.code = 'ERR_UPLOAD_FILE_FAILED'
-                throw e
-              }
-            }
-          }
-        } catch (e) {
-          if (payResult.status === 'success') {
-            if (!payResult.uploadURL) {
-              throw e
-            }
-            if (!payResult.publicURL) {
-              throw e
-            }
-          } else {
-            const e = new Error('Paying invoice has failed.')
-            e.code = 'ERR_PAY_INVOICE_FAILED'
-            throw e
-          }
-        }
-      } catch (e) {
-        if (invoiceResult.status === 'success') {
-          if (!invoiceResult.paymail) {
-            throw e
-          }
-          if (!invoiceResult.amount) {
-            throw e
-          }
-          if (!invoiceResult.ORDER_ID) {
-            throw e
-          }
-          if (!invoiceResult.publicURL) {
-            throw e
-          }
-        } else {
-          const e = new Error('Invoice creation has failed.')
-          e.code = 'ERR_INVOICE_CREATION_FAILED'
-          throw e
-        }
+      const invoiceResult = await invoice({
+        fileSize: file.size,
+        retentionPeriod: hostingMinutes,
+        serverURL
+      })
+      console.log('App():invoiceResult:', invoiceResult)
+      if (invoiceResult.status === 'error') {
+        const e = new Error('Invoice creation has failed.')
+        e.code = 'ERR_INVOICE_CREATION_FAILED'
+        throw e
       }
+      const payResult = await pay({
+        sender: await getPaymail(),
+        recipient: invoiceResult.paymail,
+        amount: invoiceResult.amount,
+        description: 'Payment to nanostore account.',
+        orderID: invoiceResult.ORDER_ID
+      })
+      console.log('App():payResult:', payResult)
+      if (payResult.status === 'error') {
+        const e = new Error('Paying invoice has failed.')
+        e.code = 'ERR_PAY_INVOICE_FAILED'
+        throw e
+      }
+      const responseResult = await upload({
+        uploadURL: payResult.uploadURL,
+        publicURL: invoiceResult.publicURL,
+        file,
+        serverURL,
+        onUploadProgress: prog => {
+          setUploadProgress(
+            parseInt((prog.loaded / prog.total) * 100)
+          )
+        }
+      })
+      if (responseResult.status === 'error') {
+        const e = new Error('Uploading file has failed.')
+        e.code = 'ERR_UPLOAD_FILE_FAILED'
+        throw e
+      }
+      setResults({
+        hash: responseResult.hash,
+        publicURL: responseResult.publicURL
+      })
     } catch (e) {
       console.error(e)
       if (e.response && e.response.data && e.response.data.description) {
