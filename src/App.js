@@ -106,7 +106,7 @@ export default () => {
         e.code = 'ERR_PAY_INVOICE_FAILED'
         throw e
       }
-      const responseResult = await upload({
+      const uploadResult = await upload({
         uploadURL: payResult.uploadURL,
         publicURL: invoiceResult.publicURL,
         file,
@@ -117,14 +117,14 @@ export default () => {
           )
         }
       })
-      if (responseResult.status === 'error') {
+      if (uploadResult.status === 'error') {
         const e = new Error('Uploading file has failed.')
         e.code = 'ERR_UPLOAD_FILE_FAILED'
         throw e
       }
       setResults({
-        hash: responseResult.hash,
-        publicURL: responseResult.publicURL
+        hash: uploadResult.hash,
+        publicURL: uploadResult.publicURL
       })
     } catch (e) {
       console.error(e)
