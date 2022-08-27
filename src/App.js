@@ -9,7 +9,6 @@ import {
   Tab,
   LinearProgress
 } from '@material-ui/core'
-import { Blob } from 'Blob'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
@@ -56,7 +55,7 @@ export default () => {
         URL: downloadURL,
         bridgeportResolvers: [bridgeportResolver]
       })
-      const blob = new Blob([data], { type: mimeType })
+      const blob = new window.Blob([data], { type: mimeType })
       const link = document.createElement('a')
       link.href = window.URL.createObjectURL(blob)
       link.download = downloadURL
@@ -92,7 +91,7 @@ export default () => {
         sender: await getPaymail(),
         recipient: invoiceResult.paymail,
         amount: invoiceResult.amount,
-        description: 'Payment to nanostore account.',
+        description: 'Upload with NanoStore UI',
         orderID: invoiceResult.ORDER_ID
       })
       console.log('App():payResult:', payResult)
