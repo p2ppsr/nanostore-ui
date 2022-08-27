@@ -89,6 +89,7 @@ export default () => {
       })
       console.log('App():invoiceResult:', invoiceResult)
       if (invoiceResult.status === 'error') {
+        console.log(invoiceResult)
         const e = new Error('Invoice creation has failed.')
         e.code = 'ERR_INVOICE_CREATION_FAILED'
         throw e
@@ -102,6 +103,7 @@ export default () => {
       })
       console.log('App():payResult:', payResult)
       if (payResult.status === 'error') {
+        console.log(payResult)
         const e = new Error('Paying invoice has failed.')
         e.code = 'ERR_PAY_INVOICE_FAILED'
         throw e
@@ -118,6 +120,7 @@ export default () => {
         }
       })
       if (uploadResult.status === 'error') {
+        console.log(uploadResult)
         const e = new Error('Uploading file has failed.')
         e.code = 'ERR_UPLOAD_FILE_FAILED'
         throw e
