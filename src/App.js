@@ -19,6 +19,8 @@ import { invoice, pay, upload } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
 import Download from '@material-ui/icons/GetApp'
 
+const isStaging = Boolean(process.env.REACT_APP_IS_STAGING)
+
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
 })
@@ -29,14 +31,16 @@ export default () => {
   const [serverURL, setServerURL] = useState(
     window.location.host.startsWith('localhost')
       ? 'http://localhost:3104'
-      : process.env.REACT_APP_IS_STAGING
+      : isStaging
         ? 'https://staging-nanostore.babbage.systems'
         : 'https://nanostore.babbage.systems'
   )
   const [bridgeportResolver, setBridgeportResolver] = useState(
     window.location.host.startsWith('localhost')
       ? 'http://localhost:3103'
-      : 'https://bridgeport.babbage.systems'
+      : isStaging
+        ? 'https://staging-bridgeport.babbage.systems'
+        : 'https://bridgeport.babbage.systems'
   )
   const [hostingMinutes, setHostingMinutes] = useState(180)
   const [file, setFile] = useState(null)
@@ -84,7 +88,9 @@ export default () => {
       const invoiceResult = await invoice({
         fileSize: file.size,
         retentionPeriod: hostingMinutes,
-        serverURL
+        config: {
+          nanostoreURL: serverURL
+        },
       })
       console.log('App():invoiceResult:', invoiceResult)
       const payResult = await pay({
@@ -92,14 +98,19 @@ export default () => {
         recipient: invoiceResult.paymail,
         amount: invoiceResult.amount,
         description: 'Upload with NanoStore UI',
-        orderID: invoiceResult.ORDER_ID
+        orderID: invoiceResult.ORDER_ID,
+        config: {
+          nanostoreURL: serverURL
+        }
       })
       console.log('App():payResult:', payResult)
       const uploadResult = await upload({
         uploadURL: payResult.uploadURL,
         publicURL: invoiceResult.publicURL,
         file,
-        serverURL,
+        config: {
+          nanostoreURL: serverURL
+        },
         onUploadProgress: prog => {
           setUploadProgress(
             parseInt((prog.loaded / prog.total) * 100)

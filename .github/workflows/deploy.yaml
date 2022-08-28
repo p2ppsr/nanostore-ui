@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
-      - run: CI=true npm run build
+      - run: CI=true REACT_APP_IS_STAGING=${{ env.CURRENT_BRANCH == 'master' }} npm run build
       - uses: RafikFarhad/push-to-gcr-github-action@v4.1
         with:
           gcloud_service_key: ${{ secrets.DOCKER_REGISTRY_PUSH_KEY }}
