@@ -94,23 +94,23 @@ export default () => {
       })
       console.log('App():invoiceResult:', invoiceResult)
       const payResult = await pay({
-        sender: await getPaymail(),
-        recipient: invoiceResult.paymail,
-        amount: invoiceResult.amount,
-        description: 'Upload with NanoStore UI',
-        orderID: invoiceResult.ORDER_ID,
-        config: {
-          nanostoreURL: serverURL
-        }
-      })
-      console.log('App():payResult:', payResult)
-      const uploadResult = await upload({
-        uploadURL: payResult.uploadURL,
-        publicURL: invoiceResult.publicURL,
-        file,
         config: {
           nanostoreURL: serverURL
         },
+        description: 'Upload with NanoStore UI',
+        orderID: invoiceResult.ORDER_ID,
+        recipientPublicKey: invoiceResult.identityKey,
+        amount: invoiceResult.amount
+      })
+      console.log('App():payResult:', payResult)
+      const uploadResult = await upload({
+        config: {
+          nanostoreURL: serverURL
+        },
+        uploadURL: payResult.uploadURL,
+        publicURL: invoiceResult.publicURL,
+        file,
+        serverURL,
         onUploadProgress: prog => {
           setUploadProgress(
             parseInt((prog.loaded / prog.total) * 100)
