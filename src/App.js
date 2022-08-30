@@ -13,7 +13,6 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
-import { getPaymail } from '@babbage/sdk'
 import { download } from 'nanoseek'
 import { invoice, pay, upload } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
@@ -90,7 +89,7 @@ export default () => {
         retentionPeriod: hostingMinutes,
         config: {
           nanostoreURL: serverURL
-        },
+        }
       })
       console.log('App():invoiceResult:', invoiceResult)
       const payResult = await pay({
