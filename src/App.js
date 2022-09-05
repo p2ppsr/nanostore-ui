@@ -41,7 +41,7 @@ export default () => {
     setLoading(true)
     try {
       if (!numberOfBytes) {
-        const e = new Error('Specify the number of bytes > 10!')
+        const e = new Error('Specify the number of bytes >= 10!')
         e.code = 'ERR_MISSING_NUMBER_OF_BYTES'
         throw e
       }
@@ -114,7 +114,7 @@ export default () => {
           <br />
           <br />
           <Typography paragraph>
-            Enter number of bytes to be purchased greater than 10
+            Enter number of bytes to be purchased greater or equal to 10
           </Typography>
           <TextField
             fullWidth
