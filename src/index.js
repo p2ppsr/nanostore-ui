@@ -4,7 +4,7 @@ import App from './App'
 import Prompt from '@babbage/react-prompt'
 
 ReactDOM.render(
-  <Prompt appName='NanoStore UI'>
+  <Prompt appName='Byteshop UI'>
     <App />
   </Prompt>,
   document.getElementById('root')

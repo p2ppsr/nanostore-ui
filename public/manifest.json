@@ -1,6 +1,6 @@
 {
-  "short_name": "NanoStore UI",
-  "name": "NanoStore UI",
+  "short_name": "Byteshop UI",
+  "name": "Byteshop UI",
   "icons": [
     {
       "src": "favicon.ico",
@@ -24,9 +24,9 @@
   "background_color": "#ffffff",
   "babbage": {
     "spendingAuthorization": {
-      "description": "Upload files for preservation or backup on the NanoStore content storage network.",
+      "description": "Purchase a number of random bytes, where the number must be greater than ten",
       "duration": "3888000",
-      "amount": "600000"
+      "amount": "10000"
     }
   }
 }

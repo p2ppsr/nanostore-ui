@@ -1,4 +1,4 @@
-# NanoStore UI
+# Byteshop UI
 
 Upload and Download Content
 
