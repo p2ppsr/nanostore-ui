@@ -57,7 +57,7 @@ export default () => {
           byteshopURL: serverURL
         },
         description: 'Buy with Byteshop UI',
-        orderID: invoiceResult.ORDER_ID,
+        orderID: invoiceResult.orderID,
         recipientPublicKey: invoiceResult.identityKey,
         amount: invoiceResult.amount
       })
