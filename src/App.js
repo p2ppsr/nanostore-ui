@@ -18,7 +18,7 @@ import { invoice, pay, upload } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
 import Download from '@material-ui/icons/GetApp'
 
-const isStaging = Boolean(process.env.REACT_APP_IS_STAGING)
+const isStaging = Boolean(window.location.host.indexOf('staging') !== -1)
 
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
