@@ -34,12 +34,12 @@ export default () => {
         ? 'https://staging-nanostore.babbage.systems'
         : 'https://nanostore.babbage.systems'
   )
-  const [bridgeportResolver, setBridgeportResolver] = useState(
+  const [confederacyHost, setConfederacyHost] = useState(
     window.location.host.startsWith('localhost')
-      ? 'http://localhost:3103'
+      ? 'http://localhost:3002'
       : isStaging
-        ? 'https://staging-bridgeport.babbage.systems'
-        : 'https://bridgeport.babbage.systems'
+        ? 'https://staging-confederacy.babbage.systems'
+        : 'https://confederacy.babbage.systems'
   )
   const [hostingMinutes, setHostingMinutes] = useState(180)
   const [file, setFile] = useState(null)
@@ -55,8 +55,8 @@ export default () => {
     setLoading(true)
     try {
       const { mimeType, data } = await download({
-        URL: downloadURL,
-        bridgeportResolvers: [bridgeportResolver]
+        UHRPUrl: downloadURL,
+        confederacyHost: [confederacyHost]
       })
       const blob = new window.Blob([data], { type: mimeType })
       const link = document.createElement('a')
@@ -168,9 +168,9 @@ export default () => {
             <br />
             <TextField
               variant='outlined'
-              label='Bridgeport Resolver URL'
-              onChange={e => setBridgeportResolver(e.target.value)}
-              value={bridgeportResolver}
+              label='Confederacy Resolver URL'
+              onChange={e => setConfederacyHost(e.target.value)}
+              value={confederacyHost}
               fullWidth
             />
             <br />
