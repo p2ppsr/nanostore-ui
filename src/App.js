@@ -18,6 +18,7 @@ import { invoice, pay, upload } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
 import Download from '@material-ui/icons/GetApp'
 
+// Currently no staging nanostore-ui!
 const isStaging = Boolean(window.location.host.indexOf('staging') !== -1)
 
 const useStyles = makeStyles(style, {
@@ -56,7 +57,7 @@ export default () => {
     try {
       const { mimeType, data } = await download({
         UHRPUrl: downloadURL,
-        confederacyHost: [confederacyHost]
+        confederacyHost
       })
       const blob = new window.Blob([data], { type: mimeType })
       const link = document.createElement('a')
