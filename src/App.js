@@ -294,7 +294,7 @@ export default () => {
       <br />
       <br />
       <Typography align='center' paragraph>
-        Check out the <a href='https://bridgeport.babbage.systems/1AJsUZ7MsJGwmkCZSoDpro28R52ptvGma7'>Universal Hash Resolution Protocol</a>!
+        Check out the <a href='https://projectbabbage.com/docs/nanostore/concepts/uhrp'>Universal Hash Resolution Protocol</a>!
       </Typography>
       <Typography align='center'>
         <a href='https://projectbabbage.com'>www.ProjectBabbage.com</a>
