@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
 import { download } from 'nanoseek'
-import { invoice, pay, upload } from 'nanostore-publisher'
+import { publishFile } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
 import Download from '@material-ui/icons/GetApp'
 
@@ -75,48 +75,20 @@ export default () => {
     e.preventDefault()
     setLoading(true)
     try {
-      if (!file) {
-        const e = new Error('Choose a file to upload!')
-        e.code = 'ERR_UI_FILE_MISSING'
-        throw e
-      }
-      if (!hostingMinutes) {
-        const e = new Error('Specify how long to host the file!')
-        e.code = 'ERR_UI_HOST_DURATION_MISSING'
-        throw e
-      }
-      const invoiceResult = await invoice({
-        fileSize: file.size,
-        retentionPeriod: hostingMinutes,
-        config: {
-          nanostoreURL: serverURL
-        }
-      })
-      console.log('App():invoiceResult:', invoiceResult)
-      const payResult = await pay({
+      // Publish the uploaded file
+      const uploadResult = await publishFile({
         config: {
           nanostoreURL: serverURL
         },
-        description: 'Upload with NanoStore UI',
-        orderID: invoiceResult.ORDER_ID,
-        recipientPublicKey: invoiceResult.identityKey,
-        amount: invoiceResult.amount
-      })
-      console.log('App():payResult:', payResult)
-      const uploadResult = await upload({
-        config: {
-          nanostoreURL: serverURL
-        },
-        uploadURL: payResult.uploadURL,
-        publicURL: invoiceResult.publicURL,
         file,
-        serverURL,
-        onUploadProgress: prog => {
+        retentionPeriod: hostingMinutes,
+        progressTracker: prog => {
           setUploadProgress(
             parseInt((prog.loaded / prog.total) * 100)
           )
         }
       })
+
       setResults({
         hash: uploadResult.hash,
         publicURL: uploadResult.publicURL
