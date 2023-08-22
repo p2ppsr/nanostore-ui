@@ -14,11 +14,12 @@ import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
 import { makeStyles } from '@material-ui/core/styles'
 import { download } from 'nanoseek'
-import { invoice, pay, upload } from 'nanostore-publisher'
+import { publishFile } from 'nanostore-publisher'
 import Upload from '@material-ui/icons/CloudUpload'
 import Download from '@material-ui/icons/GetApp'
 
-const isStaging = Boolean(process.env.REACT_APP_IS_STAGING)
+// Currently no staging nanostore-ui!
+const isStaging = Boolean(window.location.host.indexOf('staging') !== -1)
 
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
@@ -34,12 +35,12 @@ export default () => {
         ? 'https://staging-nanostore.babbage.systems'
         : 'https://nanostore.babbage.systems'
   )
-  const [bridgeportResolver, setBridgeportResolver] = useState(
+  const [confederacyHost, setConfederacyHost] = useState(
     window.location.host.startsWith('localhost')
-      ? 'http://localhost:3103'
+      ? 'http://localhost:3002'
       : isStaging
-        ? 'https://staging-bridgeport.babbage.systems'
-        : 'https://bridgeport.babbage.systems'
+        ? 'https://staging-confederacy.babbage.systems'
+        : 'https://confederacy.babbage.systems'
   )
   const [hostingMinutes, setHostingMinutes] = useState(180)
   const [file, setFile] = useState(null)
@@ -55,8 +56,8 @@ export default () => {
     setLoading(true)
     try {
       const { mimeType, data } = await download({
-        URL: downloadURL,
-        bridgeportResolvers: [bridgeportResolver]
+        UHRPUrl: downloadURL,
+        confederacyHost
       })
       const blob = new window.Blob([data], { type: mimeType })
       const link = document.createElement('a')
@@ -74,48 +75,20 @@ export default () => {
     e.preventDefault()
     setLoading(true)
     try {
-      if (!file) {
-        const e = new Error('Choose a file to upload!')
-        e.code = 'ERR_UI_FILE_MISSING'
-        throw e
-      }
-      if (!hostingMinutes) {
-        const e = new Error('Specify how long to host the file!')
-        e.code = 'ERR_UI_HOST_DURATION_MISSING'
-        throw e
-      }
-      const invoiceResult = await invoice({
-        fileSize: file.size,
-        retentionPeriod: hostingMinutes,
-        config: {
-          nanostoreURL: serverURL
-        }
-      })
-      console.log('App():invoiceResult:', invoiceResult)
-      const payResult = await pay({
+      // Publish the uploaded file
+      const uploadResult = await publishFile({
         config: {
           nanostoreURL: serverURL
         },
-        description: 'Upload with NanoStore UI',
-        orderID: invoiceResult.ORDER_ID,
-        recipientPublicKey: invoiceResult.identityKey,
-        amount: invoiceResult.amount
-      })
-      console.log('App():payResult:', payResult)
-      const uploadResult = await upload({
-        config: {
-          nanostoreURL: serverURL
-        },
-        uploadURL: payResult.uploadURL,
-        publicURL: invoiceResult.publicURL,
         file,
-        serverURL,
-        onUploadProgress: prog => {
+        retentionPeriod: hostingMinutes,
+        progressTracker: prog => {
           setUploadProgress(
             parseInt((prog.loaded / prog.total) * 100)
           )
         }
       })
+
       setResults({
         hash: uploadResult.hash,
         publicURL: uploadResult.publicURL
@@ -168,9 +141,9 @@ export default () => {
             <br />
             <TextField
               variant='outlined'
-              label='Bridgeport Resolver URL'
-              onChange={e => setBridgeportResolver(e.target.value)}
-              value={bridgeportResolver}
+              label='Confederacy Resolver URL'
+              onChange={e => setConfederacyHost(e.target.value)}
+              value={confederacyHost}
               fullWidth
             />
             <br />
@@ -293,7 +266,7 @@ export default () => {
       <br />
       <br />
       <Typography align='center' paragraph>
-        Check out the <a href='https://bridgeport.babbage.systems/1AJsUZ7MsJGwmkCZSoDpro28R52ptvGma7'>Universal Hash Resolution Protocol</a>!
+        Check out the <a href='https://projectbabbage.com/docs/nanostore/concepts/uhrp'>Universal Hash Resolution Protocol</a>!
       </Typography>
       <Typography align='center'>
         <a href='https://projectbabbage.com'>www.ProjectBabbage.com</a>
