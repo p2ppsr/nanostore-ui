@@ -11,7 +11,7 @@
     "@mui/icons-material": "^5.10.6",
     "@mui/material": "^5.10.8",
     "@mui/styles": "^5.10.9",
-    "@packetpay/js": "^0.1.7",
+    "@packetpay/js": "^0.1.9",
     "nanoseek": "^0.1.12",
     "nanostore-publisher": "^0.1.19",
     "react": "^17.0.2",
