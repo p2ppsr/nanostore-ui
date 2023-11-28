@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Theme from './Theme'
 import style from './style'
 import { makeStyles } from '@mui/styles'
 import { download } from 'nanoseek'
@@ -24,8 +25,8 @@ const isStaging = Boolean(window.location.host.indexOf('staging') !== -1)
 const useStyles = makeStyles(style, {
   name: 'Scratchpad'
 })
-export default () => {
-  const classes = useStyles()
+const App = () => {
+  //const classes = useStyles()
   const [tabIndex, setTabIndex] = useState(1)
   const [downloadURL, setDownloadURL] = useState('')
   const [serverURL, setServerURL] = useState(
@@ -115,7 +116,7 @@ export default () => {
   }
 
   return (
-    <div className={classes.content_wrap}>
+    <Theme>
       <ToastContainer />
       <center>
         <Typography variant='h4'>NanoStore UI</Typography>
@@ -271,6 +272,8 @@ export default () => {
       <Typography align='center'>
         <a href='https://projectbabbage.com'>www.ProjectBabbage.com</a>
       </Typography>
-    </div>
+    </Theme>
   )
 }
+
+export default App

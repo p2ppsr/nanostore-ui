@@ -12,6 +12,7 @@
     "@packetpay/js": "^0.1.11",
     "nanoseek": "^0.1.14",
     "nanostore-publisher": "^0.1.22",
+    "filereader": "^0.10.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^5.2.0",
@@ -26,7 +27,10 @@
     "tonone": "npm remove nanostore-publisher --silent"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [

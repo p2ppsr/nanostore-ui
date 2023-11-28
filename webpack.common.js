@@ -47,6 +47,9 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
+    fallback: {
+      fs: false // Avoid "Module not found" due to nanostore-publisher's filereader dependency.
+    }
   }
 }
