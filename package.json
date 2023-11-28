@@ -12,8 +12,8 @@
     "@mui/material": "^5.10.8",
     "@mui/styles": "^5.10.9",
     "@packetpay/js": "^0.1.11",
-    "nanoseek": "^0.1.12",
-    "nanostore-publisher": "^0.1.19",
+    "nanoseek": "^0.1.14",
+    "nanostore-publisher": "^0.1.22",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "3.4.3",
@@ -23,8 +23,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "tonpm": "",
-    "tonone": ""
+    "tonpm": "npm run tonone && npm i nanostore-publisher --silent",
+    "tonone": "npm remove nanostore-publisher --silent"
   },
   "eslintConfig": {
     "extends": "react-app"
