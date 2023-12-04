@@ -23,8 +23,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "tonpm": "npm run tonone && npm i nanostore-publisher --silent",
-    "tonone": "npm remove nanostore-publisher --silent"
+    "tonpm": "npm run tonone && npm i nanostore-publisher nanoseek @packetpay/js @babbage/react-prompt @babbage/sdk --silent",
+    "tonone": "npm remove nanostore-publisher nanoseek @packetpay/js @babbage/react-prompt @babbage/sdk --silent"
   },
   "eslintConfig": {
     "extends": "react-app"
