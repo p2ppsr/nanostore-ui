@@ -11,6 +11,7 @@ ReactDOM.render(
     authorUrl='https://projectbabbage.com'
     description='NanoStore makes it effortless for apps and users alike to buy hosting and syndication for the things they want to create and share.'
     appIcon='/nanostoreLogoIconLgt.svg'
+    supportedMetaNet='universal'
     appImages={[
       '/nanostore-ui.png'
     ]}
