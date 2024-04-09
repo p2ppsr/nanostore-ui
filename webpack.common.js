@@ -14,7 +14,7 @@ module.exports = {
       template: './public/index.html',
       filename: './index.html',
       favicon: './public/favicon.ico',
-      inject: false,    
+      inject: false,
     }),
     new NodePolyfillPlugin(),
     new CopyWebpackPlugin({
@@ -60,6 +60,9 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    fallback: {
+      fs: false
+    }
   }
 }
