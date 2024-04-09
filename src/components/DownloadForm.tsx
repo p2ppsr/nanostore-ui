@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from 'react';
 import { Button, LinearProgress, Grid, TextField, Typography } from '@mui/material'
-import { CloudDownload } from '@material-ui/icons';
+import { CloudDownload } from '@mui/icons-material'
 import { toast } from 'react-toastify';
 import { download } from 'nanoseek';
 import constants from '../utils/constants';

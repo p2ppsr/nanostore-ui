@@ -8,15 +8,15 @@ import {
   Tabs,
   Tab,
   LinearProgress
-} from '@material-ui/core'
+} from '@mui/material'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import style from './style'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 import { download } from 'nanoseek'
 import { publishFile } from 'nanostore-publisher'
-import Upload from '@material-ui/icons/CloudUpload'
-import Download from '@material-ui/icons/GetApp'
+import Upload from '@material/icons/CloudUpload'
+import Download from '@material/icons/GetApp'
 
 // Currently no staging nanostore-ui!
 const isStaging = Boolean(window.location.host.indexOf('staging') !== -1)
