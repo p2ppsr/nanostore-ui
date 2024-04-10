@@ -1,4 +1,4 @@
-import React, { FormEvent, useState, useEffect, useRef } from 'react';
+import React, { FormEvent, useState, useEffect } from 'react';
 import {
   Button,
   LinearProgress,
@@ -24,29 +24,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [inputsValid, setInputsValid] = useState<boolean>(false);
   const [newOption, setNewOption] = useState<string>('');
-  const [textFieldPosition, setTextFieldPosition] = useState(0);
 
-  const confederacyURLRef = useRef<HTMLDivElement>(null);
-  const confederacyURLTextFieldRef = useRef<HTMLInputElement>(null);
-  const UHRPTextFieldRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    // Get the Y position of the Select field
-    const selectY = confederacyURLRef.current?.getBoundingClientRect().top;
-    const selectHeight = confederacyURLRef.current?.getBoundingClientRect().height;
-    const textFieldY = confederacyURLTextFieldRef.current?.getBoundingClientRect().top;
-
-    // Set the top position of the TextField
-    if (selectY && confederacyURLTextFieldRef.current && confederacyURLTextFieldRef.current !== null && selectHeight) {
-      //setTimeout((confederacyURLTextFieldRef: { current: { style: { top: string; }; }; }) => {
-        confederacyURLTextFieldRef.current.style.top = `${(0)}px`;
-      //}, 1)
-    }
-    //if (textFieldY && UHRPTextFieldRef.current) {
-    //  UHRPTextFieldRef.current.style.top = `${textFieldY}px`;
-    //}
-  }, []); // Run this effect only once after the component mounts
-    
   useEffect(() => {
     setInputsValid(confederacyURL.trim() !== '' && downloadURL.trim() !== '');
   }, [confederacyURL, downloadURL]);
@@ -56,7 +34,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     if (constants.confederacyURLs && constants.confederacyURLs.length > 0) {
       setConfederacyURL(constants.confederacyURLs[0].toString());
     }
-
+    
   }, []); // Run this effect only once on component mount
 
   const handleDownload = async (e: FormEvent<HTMLFormElement>) => {
@@ -104,10 +82,10 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
             Download files from NanoStore
           </Typography>
         </Grid>
-        <Grid item xs={12} ref={confederacyURLRef}>
+        <Grid item xs={12}>
           <FormControl fullWidth variant="outlined">
             <InputLabel>Confederacy Resolver URL</InputLabel>
-            <Select
+            <Select style={{ marginTop: '16px' }}
               value={confederacyURL}
               onChange={handleSelectChange}
               label="Confederacy Resolver URL"
@@ -119,25 +97,23 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
               ))}
             </Select>
             {/* Render TextField for adding new option */}
-            <Grid item xs={12} ref={confederacyURLTextFieldRef}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Add your Confederacy option"
-                value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddOption();
-                  }
-                }}
-                style={{ marginTop: '8px' }}
-              />
-            </Grid>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Add your Confederacy option"
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddOption();
+                }
+              }}
+              style={{ marginTop: '8px' }}
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <TextField ref={UHRPTextFieldRef}
+          <TextField
             fullWidth
             variant="outlined"
             label="UHRP URL"
