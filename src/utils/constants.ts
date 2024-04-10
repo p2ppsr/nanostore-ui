@@ -7,8 +7,6 @@ let constants: Constants
 
 if (window.location.host.startsWith('localhost')) {
   constants = {
-    // For testing
-    //confederacyURL:  new URL('https://staging-confederacy.babbage.systems'),
     confederacyURL: new URL('http://localhost:3002'),
     nanostoreURL:  new URL('http://localhost:3104')
   }
