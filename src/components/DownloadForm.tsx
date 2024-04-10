@@ -9,6 +9,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { CloudDownload } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -16,57 +20,38 @@ import { download } from 'nanoseek';
 import constants from '../utils/constants';
 import { SelectChangeEvent } from '@mui/material';
 
-interface DownloadFormProps {}
+interface DownloadFormProps { }
 
 const DownloadForm: React.FC<DownloadFormProps> = () => {
   const [confederacyURL, setConfederacyURL] = useState<string>('');
+  const [confederacyURLs, setConfederacyURLs] = useState<string[]>(constants.confederacyURLs.map(x => x.toString()));
   const [downloadURL, setDownloadURL] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [inputsValid, setInputsValid] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [newOption, setNewOption] = useState<string>('');
-  const [textFieldPosition, setTextFieldPosition] = useState(0);
 
-  const confederacyURLRef = useRef<HTMLDivElement>(null);
-  const confederacyURLTextFieldRef = useRef<HTMLInputElement>(null);
-  const UHRPTextFieldRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    // Get the Y position of the Select field
-    const selectY = confederacyURLRef.current?.getBoundingClientRect().top;
-    const selectHeight = confederacyURLRef.current?.getBoundingClientRect().height;
-    const textFieldY = confederacyURLTextFieldRef.current?.getBoundingClientRect().top;
-
-    // Set the top position of the TextField
-    if (selectY && confederacyURLTextFieldRef.current && confederacyURLTextFieldRef.current !== null && selectHeight) {
-      //setTimeout((confederacyURLTextFieldRef: { current: { style: { top: string; }; }; }) => {
-        confederacyURLTextFieldRef.current.style.top = `${(0)}px`;
-      //}, 1)
-    }
-    //if (textFieldY && UHRPTextFieldRef.current) {
-    //  UHRPTextFieldRef.current.style.top = `${textFieldY}px`;
-    //}
-  }, []); // Run this effect only once after the component mounts
-    
   useEffect(() => {
     setInputsValid(confederacyURL.trim() !== '' && downloadURL.trim() !== '');
   }, [confederacyURL, downloadURL]);
 
   useEffect(() => {
-    // Initialize confederacyURL with the first URL from constants.confederacyURLs
     if (constants.confederacyURLs && constants.confederacyURLs.length > 0) {
       setConfederacyURL(constants.confederacyURLs[0].toString());
     }
-
-  }, []); // Run this effect only once on component mount
+  }, []);
 
   const handleDownload = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
+      console.log('download', confederacyURL)
+      console.log('downloadUHRP', downloadURL)
       const { mimeType, data } = await download({
         UHRPUrl: downloadURL.trim() || '',
-        confederacyURL: confederacyURL.trim(),
+        confederacyHost: confederacyURL.trim(),
       });
+      console.log('data', data)
       const blob = new Blob([data], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -85,13 +70,24 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
     const selectedValue = event.target.value;
-    setConfederacyURL(selectedValue);
+    if (selectedValue === 'add-new-option') {
+      setOpenDialog(true);
+    } else {
+      console.log('selected')
+      setConfederacyURL(selectedValue);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   const handleAddOption = () => {
-    if (newOption.trim() !== '') {
-      setConfederacyURL(newOption); // Set the newly added option as the selected value
-      setNewOption(''); // Clear the new option input field
+    if (newOption.trim() !== '' && !constants.confederacyURLs.includes(new URL(newOption))) {
+      setConfederacyURLs(prevConfederacyURLs => [...prevConfederacyURLs, newOption]);
+      setConfederacyURL(newOption)
+      setNewOption('')
+      setOpenDialog(false)
     }
   };
 
@@ -104,7 +100,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
             Download files from NanoStore
           </Typography>
         </Grid>
-        <Grid item xs={12} ref={confederacyURLRef}>
+        <Grid item xs={12}>
           <FormControl fullWidth variant="outlined">
             <InputLabel>Confederacy Resolver URL</InputLabel>
             <Select
@@ -112,38 +108,44 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
               onChange={handleSelectChange}
               label="Confederacy Resolver URL"
             >
-              {constants.confederacyURLs.map((url) => (
-                <MenuItem key={url.toString()} value={url.toString()}>
+              {confederacyURLs.map((url, index) => (
+                <MenuItem key={index} value={url.toString()}>
                   {url.toString()}
                 </MenuItem>
               ))}
+              <MenuItem value="add-new-option">+ Add New Option</MenuItem>
             </Select>
-            {/* Render TextField for adding new option */}
-            <Grid item xs={12} ref={confederacyURLTextFieldRef}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                label="Add your Confederacy option"
-                value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddOption();
-                  }
-                }}
-                style={{ marginTop: '8px' }}
-              />
-            </Grid>
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <TextField ref={UHRPTextFieldRef}
+          <TextField
             fullWidth
             variant="outlined"
             label="UHRP URL"
             value={downloadURL}
             onChange={(e) => setDownloadURL(e.target.value)}
           />
+          <Grid />
+
+          {/* Dialog for adding a new option */}
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogTitle>Add a New Confederacy Resolver URL</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="URL"
+                type="text"
+                fullWidth
+                value={newOption}
+                onChange={(e) => setNewOption(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button onClick={handleAddOption}>Add</Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
         <Grid item>
           <Button
@@ -166,5 +168,6 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     </form>
   );
 };
+
 
 export default DownloadForm;
