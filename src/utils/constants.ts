@@ -1,16 +1,16 @@
 interface Constants {
-  confederacyURL: URL
-  nanostoreURL: URL
-  confederacyURLs: URL[] 
-  nanostoreURLs: URL[]
+  confederacyURL: string
+  nanostoreURL: string
+  confederacyURLs: string[] 
+  nanostoreURLs: string[]
 }
 
-const confederacyLocalhostURL = new URL('http://localhost:3002')
-const nanostoreLocalURL = new URL('http://localhost:3104')
-const confederacyDevStagingURL = new URL('https://staging-confederacy.babbage.systems')
-const nanostoreDevStagingURL = new URL('https://staging-nanostore.babbage.systems')
-const confederacyProdURL = new URL('https://confederacy.babbage.systems')
-const nanostoreProdURL = new URL('https://nanostore.babbage.systems')
+const confederacyLocalhostURL = 'http://localhost:3002'
+const nanostoreLocalURL = 'http://localhost:3104'
+const confederacyDevStagingURL = 'https://staging-confederacy.babbage.systems'
+const nanostoreDevStagingURL = 'https://staging-nanostore.babbage.systems'
+const confederacyProdURL = 'https://confederacy.babbage.systems'
+const nanostoreProdURL = 'https://nanostore.babbage.systems'
 
 // Used for Confederacy dropbox
 const confederacyURLs = [

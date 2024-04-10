@@ -45,13 +45,10 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('download', confederacyURL)
-      console.log('downloadUHRP', downloadURL)
       const { mimeType, data } = await download({
         UHRPUrl: downloadURL.trim() || '',
         confederacyHost: confederacyURL.trim(),
       });
-      console.log('data', data)
       const blob = new Blob([data], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -73,7 +70,6 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     if (selectedValue === 'add-new-option') {
       setOpenDialog(true);
     } else {
-      console.log('selected')
       setConfederacyURL(selectedValue);
     }
   };
@@ -83,7 +79,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
   };
 
   const handleAddOption = () => {
-    if (newOption.trim() !== '' && !constants.confederacyURLs.includes(new URL(newOption))) {
+    if (newOption.trim() !== '' && !constants.confederacyURLs.includes(newOption)) {
       setConfederacyURLs(prevConfederacyURLs => [...prevConfederacyURLs, newOption]);
       setConfederacyURL(newOption)
       setNewOption('')
@@ -95,33 +91,33 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     <form onSubmit={handleDownload}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h4">Download Form</Typography>
-          <Typography color="textSecondary" paragraph>
+          <Typography variant='h4'>Download Form</Typography>
+          <Typography color='textSecondary' paragraph>
             Download files from NanoStore
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <FormControl fullWidth variant="outlined">
+          <FormControl fullWidth variant='outlined'>
             <InputLabel>Confederacy Resolver URL</InputLabel>
             <Select
               value={confederacyURL}
               onChange={handleSelectChange}
-              label="Confederacy Resolver URL"
+              label='Confederacy Resolver URL'
             >
               {confederacyURLs.map((url, index) => (
                 <MenuItem key={index} value={url.toString()}>
                   {url.toString()}
                 </MenuItem>
               ))}
-              <MenuItem value="add-new-option">+ Add New Option</MenuItem>
+              <MenuItem value='add-new-option'>+ Add New Option</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12}>
           <TextField
             fullWidth
-            variant="outlined"
-            label="UHRP URL"
+            variant='outlined'
+            label='UHRP URL'
             value={downloadURL}
             onChange={(e) => setDownloadURL(e.target.value)}
           />
@@ -133,9 +129,9 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
             <DialogContent>
               <TextField
                 autoFocus
-                margin="dense"
-                label="URL"
-                type="text"
+                margin='dense'
+                label='URL'
+                type='text'
                 fullWidth
                 value={newOption}
                 onChange={(e) => setNewOption(e.target.value)}
@@ -149,10 +145,10 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
         </Grid>
         <Grid item>
           <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            type="submit"
+            variant='contained'
+            color='primary'
+            size='large'
+            type='submit'
             disabled={loading || !inputsValid}
             startIcon={<CloudDownload />}
           >
