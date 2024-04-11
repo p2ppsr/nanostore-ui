@@ -35,7 +35,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <Container maxWidth='sm'>
+    <Container maxWidth='sm' sx={{ paddingTop: '2em' }}>
       <NoMncModal open={isMncMissing} onClose={() => setIsMncMissing(false)} />
       <Grid container spacing={2}>
         <ToastContainer />
