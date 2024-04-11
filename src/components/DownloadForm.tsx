@@ -1,36 +1,59 @@
-import React, { FormEvent, useState } from 'react';
-import { Button, LinearProgress, Grid, TextField, Typography } from '@mui/material'
-import { CloudDownload } from '@mui/icons-material'
+import React, { FormEvent, useState, useEffect, useRef } from 'react';
+import {
+  Button,
+  LinearProgress,
+  Grid,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
+import { CloudDownload } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { download } from 'nanoseek';
 import constants from '../utils/constants';
+import { SelectChangeEvent } from '@mui/material';
 
 interface DownloadFormProps { }
 
 const DownloadForm: React.FC<DownloadFormProps> = () => {
-  const [confederacyURL, setConfederacyURL] = useState(constants.confederacyURL.toString());
-  const [downloadURL, setDownloadURL] = useState('');
-  const [downloadProgress, setDownloadProgress] = useState<number>(0)
-  const [loading, setLoading] = useState(false);
+  const [confederacyURL, setConfederacyURL] = useState<string>('');
+  const [confederacyURLs, setConfederacyURLs] = useState<string[]>(constants.confederacyURLs.map(x => x.toString()));
+  const [downloadURL, setDownloadURL] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [inputsValid, setInputsValid] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [newOption, setNewOption] = useState<string>('');
 
-  // console.log('confederacyURL=', confederacyURL.href)
+  useEffect(() => {
+    setInputsValid(confederacyURL.trim() !== '' && downloadURL.trim() !== '');
+  }, [confederacyURL, downloadURL]);
+
+  useEffect(() => {
+    if (constants.confederacyURLs && constants.confederacyURLs.length > 0) {
+      setConfederacyURL(constants.confederacyURLs[0].toString());
+    }
+  }, []);
 
   const handleDownload = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
       const { mimeType, data } = await download({
-        UHRPUrl: downloadURL?.toString() || '',
-        confederacyURL,
+        UHRPUrl: downloadURL.trim() || '',
+        confederacyHost: confederacyURL.trim(),
       });
-
       const blob = new Blob([data], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-
-      // Assign the download attribute with the filename (using downloadURL or a default value)
-      link.download = downloadURL?.toString() || 'download';
+      link.download = downloadURL.trim() || 'download';
 
       document.body.appendChild(link);
       link.click();
@@ -42,40 +65,91 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     }
   };
 
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const selectedValue = event.target.value;
+    if (selectedValue === 'add-new-option') {
+      setOpenDialog(true);
+    } else {
+      setConfederacyURL(selectedValue);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleAddOption = () => {
+    if (newOption.trim() !== '' && !constants.confederacyURLs.includes(newOption)) {
+      setConfederacyURLs(prevConfederacyURLs => [...prevConfederacyURLs, newOption]);
+      setConfederacyURL(newOption)
+      setNewOption('')
+      setOpenDialog(false)
+    }
+  };
+
   return (
     <form onSubmit={handleDownload}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h4">Download Form</Typography>
-          <Typography color="textSecondary" paragraph>
+          <Typography variant='h4'>Download Form</Typography>
+          <Typography color='textSecondary' paragraph>
             Download files from NanoStore
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Confederacy Resolver URL"
-            value={confederacyURL}
-            onChange={(e) => setConfederacyURL(e.target.value)}
-          />
+          <FormControl fullWidth variant='outlined'>
+            <InputLabel>Confederacy Resolver URL</InputLabel>
+            <Select
+              value={confederacyURL}
+              onChange={handleSelectChange}
+              label='Confederacy Resolver URL'
+            >
+              {confederacyURLs.map((url, index) => (
+                <MenuItem key={index} value={url.toString()}>
+                  {url.toString()}
+                </MenuItem>
+              ))}
+              <MenuItem value='add-new-option'>+ Add New Option</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12}>
           <TextField
             fullWidth
-            variant="outlined"
-            label="UHRP URL"
+            variant='outlined'
+            label='UHRP URL'
             value={downloadURL}
             onChange={(e) => setDownloadURL(e.target.value)}
           />
+          <Grid />
+
+          {/* Dialog for adding a new option */}
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogTitle>Add a New Confederacy Resolver URL</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin='dense'
+                label='URL'
+                type='text'
+                fullWidth
+                value={newOption}
+                onChange={(e) => setNewOption(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Cancel</Button>
+              <Button onClick={handleAddOption}>Add</Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
         <Grid item>
           <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            type="submit"
-            disabled={loading}
+            variant='contained'
+            color='primary'
+            size='large'
+            type='submit'
+            disabled={loading || !inputsValid}
             startIcon={<CloudDownload />}
           >
             Download
@@ -88,7 +162,8 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
         </Grid>
       </Grid>
     </form>
-  )
-}
+  );
+};
+
 
 export default DownloadForm;

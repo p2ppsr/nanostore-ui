@@ -29,7 +29,7 @@ const NoMncModal: React.FC<NoMncModalProps> = ({ open, onClose }) => {
     >
       <Box sx={style} className='focusBorderNone'>
         <Typography id='modal-modal-title' variant='h6' component='h2'>
-          PeerPay requires the MetaNet Client
+          NanoStore requires the MetaNet Client
         </Typography>
         <Typography id='modal-modal-description' sx={{ mt: 2 }}>
           If you don't have it yet, it can be downloaded on{' '}
