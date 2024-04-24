@@ -4,7 +4,7 @@
   "private": true,
   "license": "Open BSV License",
   "dependencies": {
-    "@babbage/react-prompt": "^0.2.18",
+    "@babbage/react-prompt": "^0.2.19",
     "@babbage/sdk-ts": "^0.2.19",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.6",
