@@ -3,7 +3,7 @@ import { getNetwork } from '@babbage/sdk-ts'
 export default async function checkForMetaNetClient() {
   try {
     const result = await getNetwork()
-    if (result === 'mainnet') {
+    if (result === 'mainnet' || result === 'testnet') {
       return 1
     } else {
       return -1
