@@ -12,7 +12,7 @@
     "@types/jest": "^29.5.11",
     "@types/node": "^20.11.0",
     "@types/react": "^17.0.0",
-    "email-tokenator": "^0.1.30",
+    "email-tokenator": "^0.1.31",
     "filereader": "^0.10.3",
     "metanet-react-prompt": "^0.1.18",
     "nanoseek": "^0.2.26",
