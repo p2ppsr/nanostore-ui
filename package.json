@@ -12,7 +12,7 @@
     "@types/jest": "^29.5.11",
     "@types/node": "^20.11.0",
     "@types/react": "^17.0.0",
-    "email-tokenator": "^0.1.29",
+    "email-tokenator": "^0.1.30",
     "filereader": "^0.10.3",
     "metanet-react-prompt": "^0.1.18",
     "nanoseek": "^0.2.26",
@@ -24,7 +24,7 @@
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "react-toastify": "^8.2.0",
-    "uhrp-react": "^0.2.27",
+    "uhrp-react": "^0.2.28",
     "uhrp-url": "^0.1.10",
     "use-async-effect": "^2.2.7",
     "zustand": "^4.5.0"
