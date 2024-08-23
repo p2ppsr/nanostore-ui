@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react'
+import React, { useState, type ChangeEvent, type FormEvent, useEffect } from 'react'
 import {
   Button,
   LinearProgress,
@@ -9,7 +9,7 @@ import {
   Typography,
   FormControl,
   InputLabel,
-  SelectChangeEvent,
+  type SelectChangeEvent,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -20,9 +20,7 @@ import { toast } from 'react-toastify'
 import { publishFile } from 'nanostore-publisher'
 import constants from '../utils/constants'
 
-interface UploadFormProps {}
-
-const UploadForm: React.FC<UploadFormProps> = () => {
+const UploadForm: React.FC = () => {
   const [nanostoreURL, setNanostoreURL] = useState<string>('')
   const [nanostoreURLs, setNanostoreURLs] = useState<string[]>(constants.nanostoreURLs.map(x => x.toString()))
   const [hostingMinutes, setHostingMinutes] = useState<number>(180) // Default: 3 Hours (180 minutes)
@@ -30,23 +28,10 @@ const UploadForm: React.FC<UploadFormProps> = () => {
   const [file, setFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [isFormValid, setIsFormValid] = useState<boolean>(false)
-  const [results, setResults] = useState<{ hash: string; publicURL: string } | null>(
-    null
-  )
+  const [results, setResults] = useState<{ hash: string, publicURL: string } | null>(null)
   const [actionTXID, setActionTXID] = useState('')
-  const [inputsValid, setInputsValid] = useState<boolean>(false)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [newOption, setNewOption] = useState<string>('')
-
-  useEffect(() => {
-    setInputsValid(nanostoreURL.trim() !== '' && nanostoreURL.trim() !== '')
-  }, [nanostoreURL])
-
-  useEffect(() => {
-    if (constants.nanostoreURLs && constants.nanostoreURLs.length > 0) {
-      setNanostoreURL(constants.nanostoreURLs[0].toString())
-    }
-  }, [])
 
   useEffect(() => {
     setIsFormValid(
@@ -54,29 +39,38 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     )
   }, [nanostoreURL, hostingMinutes, file])
 
-  const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (Array.isArray(constants.nanostoreURLs) && constants.nanostoreURLs.length > 0) {
+      setNanostoreURL(constants.nanostoreURLs[0].toString())
+    }
+  }, [])
+
+  const handleUpload = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     setLoading(true)
     setActionTXID('')
     try {
-      const uploadResult = await publishFile({
-        config: {
-          nanostoreURL: nanostoreURL
-        },
-        file: file!,
-        retentionPeriod: hostingMinutes,
-        progressTracker: (prog: ProgressEvent) => {
-          const progress = prog.total > 0 ? (prog.loaded / prog.total) * 100 : 0
-          setUploadProgress(progress)
-        }
-      })
+      if (file !== null) {
+        const uploadResult = await publishFile({
+          config: {
+            nanostoreURL
+          },
+          file,
+          retentionPeriod: hostingMinutes,
+          progressTracker: (prog: ProgressEvent) => {
+            const progress = prog.total > 0 ? (prog.loaded / prog.total) * 100 : 0
+            setUploadProgress(progress)
+          }
+        })
 
-      // Handle upload success
-      setResults({
-        hash: uploadResult.hash,
-        publicURL: uploadResult.publicURL
-      })
-
+        // Handle upload success
+        setResults({
+          hash: uploadResult.hash,
+          publicURL: uploadResult.publicURL
+        })
+      } else {
+        throw new Error('No file selected')
+      }
     } catch (error) {
       console.error(error)
       toast.error('Upload failed')
@@ -86,10 +80,9 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     }
   }
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const selectedFiles = e.target.files
-
-    if (selectedFiles && selectedFiles.length > 0) {
+    if (selectedFiles !== null && selectedFiles.length > 0) {
       const firstFile = selectedFiles[0]
       if (firstFile instanceof File) {
         setFile(firstFile)
@@ -101,7 +94,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     }
   }
 
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+  const handleSelectChange = (event: SelectChangeEvent<string>): void => {
     const selectedValue = event.target.value
     if (selectedValue === 'add-new-option') {
       setOpenDialog(true)
@@ -110,11 +103,11 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     }
   }
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (): void => {
     setOpenDialog(false)
   }
 
-  const handleAddOption = () => {
+  const handleAddOption = (): void => {
     if (newOption.trim() !== '' && !constants.nanostoreURLs.includes(newOption)) {
       setNanostoreURLs(prevNanostoreURLs => [...prevNanostoreURLs, newOption])
       setNanostoreURL(newOption)
@@ -158,7 +151,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
               variant='outlined'
               style={{ width: '100%' }}
               value={hostingMinutes}
-              onChange={e => setHostingMinutes(Number(e.target.value))}
+              onChange={e => { setHostingMinutes(Number(e.target.value)) }}
               inputProps={{ style: { height: '40px' } }}
             >
               <MenuItem value={180}>3 Hours</MenuItem>
@@ -182,7 +175,6 @@ const UploadForm: React.FC<UploadFormProps> = () => {
           <input type='file' name='file' onChange={handleFileChange} />
         </Grid>
         <Grid item xs={12}>
-          {/* Dialog for adding a new option */}
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>Add a New Server URL</DialogTitle>
             <DialogContent>
@@ -193,7 +185,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
                 type='text'
                 fullWidth
                 value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
+                onChange={(e) => { setNewOption(e.target.value) }}
               />
             </DialogContent>
             <DialogActions>
@@ -222,7 +214,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
             />
           </Grid>
         )}
-        {results && (
+        {results !== null && (
           <Grid item xs={12}>
             <Typography variant='h6'>Upload Successful!</Typography>
             <Typography><b>Payment TXID:</b>{' '}{actionTXID}</Typography>

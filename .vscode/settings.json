@@ -1,0 +1,8 @@
+{
+    "eslint.validate": ["typescript", "javascript"],
+    "eslint.packageManager": "npm",
+    "standard.enable": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+}
+  
