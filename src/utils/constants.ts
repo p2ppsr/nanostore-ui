@@ -1,7 +1,7 @@
 interface Constants {
   confederacyURL: string
   nanostoreURL: string
-  confederacyURLs: string[] 
+  confederacyURLs: string[]
   nanostoreURLs: string[]
 }
 
@@ -32,25 +32,25 @@ if (window.location.host.startsWith('localhost')) {
   // Local
   constants = {
     confederacyURL: confederacyLocalhostURL,
-    nanostoreURL:  nanostoreLocalURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    nanostoreURL: nanostoreLocalURL,
+    confederacyURLs,
+    nanostoreURLs
   }
 } else if (window.location.host.startsWith('staging') || process.env.NODE_ENV === 'development') {
   // Staging/Development
   constants = {
-    confederacyURL:  confederacyDevStagingURL,
-    nanostoreURL:  nanostoreDevStagingURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURL: confederacyDevStagingURL,
+    nanostoreURL: nanostoreDevStagingURL,
+    confederacyURLs,
+    nanostoreURLs
   }
 } else {
   // Production
   constants = {
     confederacyURL: confederacyProdURL,
     nanostoreURL: nanostoreProdURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURLs,
+    nanostoreURLs
   }
 }
 

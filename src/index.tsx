@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CssBaseline } from '@mui/material'
 import { ThemeProvider } from '@mui/material/styles'
@@ -6,9 +6,14 @@ import App from './App'
 import web3Theme from './theme'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { MNCErrorHandlerProvider } from 'metanet-react-prompt'
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
+const rootElement = document.getElementById('root')
+
+if (rootElement === null) {
+  throw new Error('Failed to find the root element')
+}
+
+const root = ReactDOM.createRoot(rootElement)
 root.render(
   <ThemeProvider theme={web3Theme}>
     <ToastContainer

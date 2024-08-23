@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [isMncMissing, setIsMncMissing] = useState<boolean>(false)
 
   // Run a 1s interval for checking if MNC is running
-  useAsyncEffect(async () => {
+  useAsyncEffect(() => {
     const intervalId = setInterval(async () => {
       const hasMNC = await checkForMetaNetClient()
       if (hasMNC === 0) {
@@ -30,32 +30,32 @@ const App: React.FC = () => {
     }
   }, [])
 
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number): void => {
     setTabIndex(newValue)
   }
 
   return (
-    <Container maxWidth='sm' sx={{ paddingTop: '2em' }}>
-      <NoMncModal open={isMncMissing} onClose={() => setIsMncMissing(false)} />
+    <Container maxWidth="sm" sx={{ paddingTop: '2em' }}>
+      <NoMncModal open={isMncMissing} onClose={() => { setIsMncMissing(false) }} />
       <Grid container spacing={2}>
         <ToastContainer />
         <Grid item xs={12}>
-          <Typography variant='h4' align='center'>
+          <Typography variant="h4" align="center">
             NanoStore UI
           </Typography>
-          <Typography color='textSecondary' paragraph align='center'>
+          <Typography color="textSecondary" paragraph align="center">
             Upload and Download Content
           </Typography>
           <Tabs
             value={tabIndex}
             onChange={handleTabChange}
-            indicatorColor='primary'
-            textColor='primary'
-            variant='fullWidth'
+            indicatorColor="primary"
+            textColor="primary"
+            variant="fullWidth"
           >
-            <Tab label='Download' />
-            <Tab label='Upload' />
-            <Tab label='Renew (coming soon)' disabled />
+            <Tab label="Download" />
+            <Tab label="Upload" />
+            <Tab label="Renew (coming soon)" disabled />
           </Tabs>
         </Grid>
         <Grid item xs={12}>
