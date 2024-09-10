@@ -35,27 +35,27 @@ const App: React.FC = () => {
   }
 
   return (
-    <Container maxWidth='sm' sx={{ paddingTop: '2em' }}>
+    <Container maxWidth="sm" sx={{ paddingTop: '2em' }}>
       <NoMncModal open={isMncMissing} onClose={() => setIsMncMissing(false)} />
       <Grid container spacing={2}>
         <ToastContainer />
         <Grid item xs={12}>
-          <Typography variant='h4' align='center'>
+          <Typography variant="h4" align="center">
             NanoStore UI
           </Typography>
-          <Typography color='textSecondary' paragraph align='center'>
+          <Typography color="textSecondary" paragraph align="center">
             Upload and Download Content
           </Typography>
           <Tabs
             value={tabIndex}
             onChange={handleTabChange}
-            indicatorColor='primary'
-            textColor='primary'
-            variant='fullWidth'
+            indicatorColor="primary"
+            textColor="primary"
+            variant="fullWidth"
           >
-            <Tab label='Download' />
-            <Tab label='Upload' />
-            <Tab label='Renew (coming soon)' disabled />
+            <Tab label="Download" />
+            <Tab label="Upload" />
+            <Tab label="Renew (coming soon)" disabled />
           </Tabs>
         </Grid>
         <Grid item xs={12}>
