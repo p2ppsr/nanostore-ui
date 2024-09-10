@@ -5,7 +5,7 @@ module.exports = merge(common, {
   mode: 'development',
   devServer: {
     open: true,
-    port: 8089, // you can change the port
+    port: 8091, // you can change the port
     client: {
       overlay: true // Show application errors
     },

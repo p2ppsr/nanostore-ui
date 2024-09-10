@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import { CloudUpload } from '@mui/icons-material'
 import { toast } from 'react-toastify'
-import { publishFile } from 'nanostore-publisher'
+import { publishFile } from '../../../nanostore-publisher/src/index'
 import constants from '../utils/constants'
 
 interface UploadFormProps {}
@@ -65,16 +65,16 @@ const UploadForm: React.FC<UploadFormProps> = () => {
         },
         file: file!,
         retentionPeriod: hostingMinutes,
-        progressTracker: (prog: ProgressEvent) => {
-          const progress = prog.total > 0 ? (prog.loaded / prog.total) * 100 : 0
+        progressTracker: (prog: Number) => {
+          const progress = Number(prog) > 0 ? ((Number(prog) / Number((prog)) * 100)) : 0
           setUploadProgress(progress)
         }
       })
 
       // Handle upload success
       setResults({
-        hash: uploadResult.hash,
-        publicURL: uploadResult.publicURL
+        hash: uploadResult?.hash?? '',
+        publicURL: uploadResult?.publicURL?? ''
       })
 
     } catch (error) {

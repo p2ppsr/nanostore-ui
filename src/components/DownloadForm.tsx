@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { CloudDownload } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { download } from 'nanoseek';
+import { download } from '../../../nanoseek/src/index';
 import constants from '../utils/constants';
 import { SelectChangeEvent } from '@mui/material';
 
@@ -49,7 +49,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
         UHRPUrl: downloadURL.trim() || '',
         confederacyHost: confederacyURL.trim(),
       });
-      const blob = new Blob([data], { type: mimeType });
+      const blob = new Blob([data], { type: mimeType || undefined });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -164,6 +164,5 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
     </form>
   );
 };
-
 
 export default DownloadForm;
