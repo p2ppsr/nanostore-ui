@@ -24,18 +24,15 @@ interface UploadFormProps {}
 
 const UploadForm: React.FC<UploadFormProps> = () => {
   const [nanostoreURL, setNanostoreURL] = useState<string>('')
-  const [nanostoreURLs, setNanostoreURLs] = useState<string[]>(
-    constants.nanostoreURLs.map(x => x.toString())
-  )
+  const [nanostoreURLs, setNanostoreURLs] = useState<string[]>(constants.nanostoreURLs.map(x => x.toString()))
   const [hostingMinutes, setHostingMinutes] = useState<number>(180) // Default: 3 Hours (180 minutes)
   const [loading, setLoading] = useState<boolean>(false)
   const [file, setFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [isFormValid, setIsFormValid] = useState<boolean>(false)
-  const [results, setResults] = useState<{
-    hash: string
-    publicURL: string
-  } | null>(null)
+  const [results, setResults] = useState<{ hash: string; publicURL: string } | null>(
+    null
+  )
   const [actionTXID, setActionTXID] = useState('')
   const [inputsValid, setInputsValid] = useState<boolean>(false)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
@@ -68,18 +65,23 @@ const UploadForm: React.FC<UploadFormProps> = () => {
         },
         file: file!,
         retentionPeriod: hostingMinutes,
-        progressTracker: (prog: Number) => {
-          const progress =
-            Number(prog) > 0 ? (Number(prog) / Number(prog)) * 100 : 0
+        progressTracker: (prog: number) => {
+          const progress = prog > 0 ? (prog / prog) * 100 : 0
           setUploadProgress(progress)
         }
       })
 
-      // Handle upload success
-      setResults({
-        hash: uploadResult?.hash ?? '',
-        publicURL: uploadResult?.publicURL ?? ''
-      })
+      if (uploadResult) {
+        // Handle upload success
+        setResults({
+          hash: uploadResult.hash,
+          publicURL: uploadResult.publicURL
+        });
+      } else {
+        // Handle case where uploadResult is undefined, if necessary
+        console.error('Upload result is undefined.');
+      }
+      
     } catch (error) {
       console.error(error)
       toast.error('Upload failed')
@@ -118,10 +120,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
   }
 
   const handleAddOption = () => {
-    if (
-      newOption.trim() !== '' &&
-      !constants.nanostoreURLs.includes(newOption)
-    ) {
+    if (newOption.trim() !== '' && !constants.nanostoreURLs.includes(newOption)) {
       setNanostoreURLs(prevNanostoreURLs => [...prevNanostoreURLs, newOption])
       setNanostoreURL(newOption)
       setNewOption('')
@@ -133,35 +132,35 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     <form onSubmit={handleUpload}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant="h4">Upload Form</Typography>
-          <Typography color="textSecondary" paragraph>
+          <Typography variant='h4'>Upload Form</Typography>
+          <Typography color='textSecondary' paragraph>
             Upload files to NanoStore
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <FormControl fullWidth variant="outlined">
+          <FormControl fullWidth variant='outlined'>
             <InputLabel>Nanostore Server URL</InputLabel>
             <Select
               value={nanostoreURL}
               onChange={handleSelectChange}
-              label="Nanostore Server URL"
+              label='Nanostore Server URL'
             >
               {nanostoreURLs.map((url, index) => (
                 <MenuItem key={index} value={url.toString()}>
                   {url.toString()}
                 </MenuItem>
               ))}
-              <MenuItem value="add-new-option">+ Add New Option</MenuItem>
+              <MenuItem value='add-new-option'>+ Add New Option</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <FormControl fullWidth variant="outlined">
+          <FormControl fullWidth variant='outlined'>
             <InputLabel>Duration</InputLabel>
             <Select
               fullWidth
-              label="Duration"
-              variant="outlined"
+              label='Duration'
+              variant='outlined'
               style={{ width: '100%' }}
               value={hostingMinutes}
               onChange={e => setHostingMinutes(Number(e.target.value))}
@@ -185,7 +184,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <input type="file" name="file" onChange={handleFileChange} />
+          <input type='file' name='file' onChange={handleFileChange} />
         </Grid>
         <Grid item xs={12}>
           {/* Dialog for adding a new option */}
@@ -194,12 +193,12 @@ const UploadForm: React.FC<UploadFormProps> = () => {
             <DialogContent>
               <TextField
                 autoFocus
-                margin="dense"
-                label="URL"
-                type="text"
+                margin='dense'
+                label='URL'
+                type='text'
                 fullWidth
                 value={newOption}
-                onChange={e => setNewOption(e.target.value)}
+                onChange={(e) => setNewOption(e.target.value)}
               />
             </DialogContent>
             <DialogActions>
@@ -210,10 +209,10 @@ const UploadForm: React.FC<UploadFormProps> = () => {
         </Grid>
         <Grid item xs={12}>
           <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            type="submit"
+            variant='contained'
+            color='primary'
+            size='large'
+            type='submit'
             disabled={loading || !isFormValid}
             startIcon={<CloudUpload />}
           >
@@ -230,24 +229,12 @@ const UploadForm: React.FC<UploadFormProps> = () => {
         )}
         {results && (
           <Grid item xs={12}>
-            <Typography variant="h6">Upload Successful!</Typography>
-            <Typography>
-              <b>Payment TXID:</b> {actionTXID}
-            </Typography>
-            <Typography variant="body1">
-              <b>UHRP URL (can never change, works with all nodes):</b>{' '}
-              {results.hash}
-            </Typography>
-            <Typography variant="body1">
-              <b>
-                Legacy HTTPS URL (only for this node and commitment, may
-                expire):
-              </b>{' '}
-              <a
-                href={results.publicURL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+            <Typography variant='h6'>Upload Successful!</Typography>
+            <Typography><b>Payment TXID:</b>{' '}{actionTXID}</Typography>
+            <Typography variant='body1'><b>UHRP URL (can never change, works with all nodes):</b>{' '}{results.hash}</Typography>
+            <Typography variant='body1'>
+              <b>Legacy HTTPS URL (only for this node and commitment, may expire):</b>{' '}
+              <a href={results.publicURL} target='_blank' rel='noopener noreferrer'>
                 {results.publicURL}
               </a>
             </Typography>
