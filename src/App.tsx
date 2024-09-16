@@ -30,7 +30,7 @@ const App: React.FC = () => {
     }
   }, [])
 
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue)
   }
 

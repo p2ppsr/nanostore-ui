@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Modal, Box, Typography } from '@mui/material'
+import { Modal, Box, Typography } from '@mui/material'
 import './NoMncModal.scss'
 
 const style = {
@@ -32,7 +32,7 @@ const NoMncModal: React.FC<NoMncModalProps> = ({ open, onClose }) => {
           NanoStore requires the MetaNet Client
         </Typography>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          If you don't have it yet, it can be downloaded on{' '}
+          If you don&apos;t have it yet, it can be downloaded on{' '}
           <a
             href="https://projectbabbage.com/desktop/res/MetaNet%20Client.exe"
             target="_blank"

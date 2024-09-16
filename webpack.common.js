@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
@@ -14,7 +15,7 @@ module.exports = {
       template: './public/index.html',
       filename: './index.html',
       favicon: './public/favicon.ico',
-      inject: false,
+      inject: false
     }),
     new NodePolyfillPlugin(),
     new CopyWebpackPlugin({
@@ -26,7 +27,7 @@ module.exports = {
           }
         }
       ]
-    }),
+    })
   ],
   module: {
     rules: [
@@ -50,7 +51,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,

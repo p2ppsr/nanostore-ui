@@ -33,8 +33,8 @@ if (window.location.host.startsWith('localhost')) {
   constants = {
     confederacyURL: confederacyLocalhostURL,
     nanostoreURL: nanostoreLocalURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURLs,
+    nanostoreURLs
   }
 } else if (
   window.location.host.startsWith('staging') ||
@@ -44,16 +44,16 @@ if (window.location.host.startsWith('localhost')) {
   constants = {
     confederacyURL: confederacyDevStagingURL,
     nanostoreURL: nanostoreDevStagingURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURLs,
+    nanostoreURLs
   }
 } else {
   // Production
   constants = {
     confederacyURL: confederacyProdURL,
     nanostoreURL: nanostoreProdURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURLs,
+    nanostoreURLs
   }
 }
 
