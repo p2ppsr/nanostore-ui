@@ -1,8 +1,8 @@
 interface Constants {
   confederacyURL: string
   nanostoreURL: string
-  confederacyURLs: string[]
-  nanostoreURLs: string[]
+  confederacyURLs: readonly string[]
+  nanostoreURLs: readonly string[]
 }
 
 const confederacyLocalhostURL = 'http://localhost:3002'
@@ -17,14 +17,14 @@ const confederacyURLs = [
   confederacyLocalhostURL,
   confederacyDevStagingURL,
   confederacyProdURL
-]
+] as const
 
 // Used for Nanostore dropbox
 const nanostoreURLs = [
   nanostoreLocalURL,
   nanostoreDevStagingURL,
   nanostoreProdURL
-]
+] as const
 
 let constants: Constants
 

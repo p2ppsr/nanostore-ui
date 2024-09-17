@@ -24,14 +24,14 @@ const NoMncModal: React.FC<NoMncModalProps> = ({ open, onClose }) => {
     <Modal
       open={open}
       onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
       <Box sx={style} className="focusBorderNone">
-        <Typography id="modal-modal-title" variant="h6" component="h2">
+        <Typography id="modal-title" variant="h6" component="h2">
           NanoStore requires the MetaNet Client
         </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+        <Typography id="modal-description" sx={{ mt: 2 }}>
           If you don&apos;t have it yet, it can be downloaded on{' '}
           <a
             href="https://projectbabbage.com/desktop/res/MetaNet%20Client.exe"

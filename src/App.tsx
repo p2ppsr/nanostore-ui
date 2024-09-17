@@ -13,16 +13,13 @@ import './App.scss'
 const App: React.FC = () => {
   const [tabIndex, setTabIndex] = useState<number>(0)
   const [isMncMissing, setIsMncMissing] = useState<boolean>(false)
+  const NETWORK_NOT_FOUND = -1
 
-  // Run a 1s interval for checking if MNC is running
+  // Run a 1 sec interval for checking if MNC is running
   useAsyncEffect(async () => {
     const intervalId = setInterval(async () => {
       const hasMNC = await checkForMetaNetClient()
-      if (hasMNC === 0) {
-        setIsMncMissing(true) // Open modal if MNC is not found
-      } else {
-        setIsMncMissing(false) // Ensure modal is closed if MNC is found
-      }
+      setIsMncMissing(hasMNC === NETWORK_NOT_FOUND) // Open modal if MNC is not found
     }, 1000)
 
     return () => {

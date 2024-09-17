@@ -223,7 +223,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
             </DialogActions>
           </Dialog>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item>
           <Button
             variant="contained"
             color="primary"
@@ -234,15 +234,17 @@ const UploadForm: React.FC<UploadFormProps> = () => {
           >
             Upload
           </Button>
+          {/* Progress bar restricted to button width with percentage indicator */}
+          {loading && (
+            <>
+              <LinearProgress
+                variant={uploadProgress === 0 ? 'indeterminate' : 'determinate'}
+                value={uploadProgress}
+                style={{ width: '100%' }}
+              />
+            </>
+          )}
         </Grid>
-        {loading && (
-          <Grid item xs={12}>
-            <LinearProgress
-              variant={uploadProgress === 0 ? 'indeterminate' : 'determinate'}
-              value={uploadProgress}
-            />
-          </Grid>
-        )}
         {results && (
           <Grid item xs={12}>
             <Typography variant="h6">Upload Successful!</Typography>

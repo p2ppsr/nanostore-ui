@@ -2,18 +2,20 @@ import { createTheme } from '@mui/material/styles'
 
 // Define a custom theme with a dark background
 
-// Define custom spacing function compatible with Spacing type
-const customSpacing = (factor: number): string => `${8 * factor}px`
+// Define custom spacing function compatible with MUI Spacing type
+const customSpacing = (factor: number): number => 8 * factor
 
 // Create custom theme using createTheme
 const web3Theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#00d1b2'
+      main: '#00d1b2',
+      contrastText: '#ffffff'
     },
     secondary: {
-      main: '#7e57c2'
+      main: '#7e57c2',
+      contrastText: '#ffffff'
     },
     background: {
       default: '#121212',
@@ -36,4 +38,4 @@ const web3Theme = createTheme({
   spacing: customSpacing
 })
 
-export default web3Theme // Export custom theme
+export default web3Theme
