@@ -6,11 +6,15 @@ const Footer: React.FC = () => {
     <>
       <br />
       <br />
-      <Typography align='center' paragraph>
-        Check out the <a href='https://projectbabbage.com/docs/nanostore/concepts/uhrp'>Universal Hash Resolution Protocol</a>!
+      <Typography align="center" paragraph>
+        Check out the{' '}
+        <a href="https://projectbabbage.com/docs/nanostore/concepts/uhrp">
+          Universal Hash Resolution Protocol
+        </a>
+        !
       </Typography>
-      <Typography align='center'>
-        <a href='https://projectbabbage.com'>www.ProjectBabbage.com</a>
+      <Typography align="center">
+        <a href="https://projectbabbage.com">www.ProjectBabbage.com</a>
       </Typography>
     </>
   )

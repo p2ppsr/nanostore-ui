@@ -31,7 +31,23 @@
   },
   "scripts": {
     "start": "webpack serve --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "doc": "documentation readme src/index.ts --section=API",
+    "lint": "eslint src/**/*.ts*",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "test:integration": "jest --config jest.integration.config.js",
+    "coverage": "jest --coverage",
+    "test:performance": "node performance-tests.js",
+    "docs:validate": "documentation lint src/**/*.ts*",
+    "test:e2e": "cypress run",
+    "test:compatibility": "node compatibility-tests.js",
+    "config:validate": "node validate-config.js",
+    "test:custom": "node custom-tests.js",
+    "test:all": "npm run lint && npm run type-check && npm run test && npm run test:integration && npm run coverage && npm audit && npm run test:performance && npm run docs:validate && npm run test:e2e && npm run test:compatibility && npm run config:validate && npm run test:custom",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --watch",
+    "format": "prettier --write \"src/**/*.ts*\""
   },
   "eslintConfig": {
     "extends": [
@@ -58,11 +74,15 @@
     "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "@types/react-router-dom": "^5.3.3",
-    "@typescript-eslint/eslint-plugin": "^6.20.0",
-    "@typescript-eslint/parser": "^6.20.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "babel-loader": "^8.2.5",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.10.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-react": "^7.36.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "html-webpack-plugin": "^5.5.0",
     "interpolate-html-plugin": "^4.0.0",
@@ -72,11 +92,16 @@
     "standard": "^17.0.0",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.1.6",
     "url-loader": "^4.1.1",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.2",
     "webpack-merge": "^5.10.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint": {
+      "optional": true
+    }
   }
 }

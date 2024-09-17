@@ -1,4 +1,4 @@
-import React, { FormEvent, useState, useEffect, useRef } from 'react';
+import React, { FormEvent, useState, useEffect } from 'react'
 import {
   Button,
   LinearProgress,
@@ -13,142 +13,148 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from '@mui/material';
-import { CloudDownload } from '@mui/icons-material';
-import { toast } from 'react-toastify';
-import { download } from 'nanoseek';
-import constants from '../utils/constants';
-import { SelectChangeEvent } from '@mui/material';
+  SelectChangeEvent
+} from '@mui/material'
+import { CloudDownload } from '@mui/icons-material'
+import { toast } from 'react-toastify'
+import { isValidURL } from 'uhrp-url'
+import { download } from '../../../nanoseek/src/index'
+import constants from '../utils/constants'
 
-interface DownloadFormProps { }
+type DownloadFormProps = Record<string, never>
 
 const DownloadForm: React.FC<DownloadFormProps> = () => {
-  const [confederacyURL, setConfederacyURL] = useState<string>('');
-  const [confederacyURLs, setConfederacyURLs] = useState<string[]>(constants.confederacyURLs.map(x => x.toString()));
-  const [downloadURL, setDownloadURL] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [inputsValid, setInputsValid] = useState<boolean>(false);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [newOption, setNewOption] = useState<string>('');
+  const [confederacyURL, setConfederacyURL] = useState<string>('')
+  const [confederacyURLs, setConfederacyURLs] = useState<string[]>(
+    constants.confederacyURLs.map(x => x.toString())
+  )
+  const [downloadURL, setDownloadURL] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [inputsValid, setInputsValid] = useState<boolean>(false)
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [newOption, setNewOption] = useState<string>('')
 
   useEffect(() => {
-    setInputsValid(confederacyURL.trim() !== '' && downloadURL.trim() !== '');
-  }, [confederacyURL, downloadURL]);
+    setInputsValid(downloadURL.trim() !== '' && isValidURL(downloadURL.trim()))
+  }, [downloadURL])
 
   useEffect(() => {
     if (constants.confederacyURLs && constants.confederacyURLs.length > 0) {
-      setConfederacyURL(constants.confederacyURLs[0].toString());
+      setConfederacyURL(constants.confederacyURLs[0].toString())
     }
-  }, []);
+  }, [])
 
   const handleDownload = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     try {
       const { mimeType, data } = await download({
         UHRPUrl: downloadURL.trim() || '',
-        confederacyHost: confederacyURL.trim(),
-      });
-      const blob = new Blob([data], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = downloadURL.trim() || 'download';
+        confederacyHost: confederacyURL.trim()
+      })
+      const blob = new Blob([data], { type: mimeType || undefined })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = downloadURL.trim() || 'download'
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     } catch (error) {
-      toast.error('An error occurred during download');
+      console.error('Download error:', error)
+      toast.error(
+        'An error occurred during download. Please check the URL and try again.'
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    const selectedValue = event.target.value;
+    const selectedValue = event.target.value
     if (selectedValue === 'add-new-option') {
-      setOpenDialog(true);
+      setOpenDialog(true)
     } else {
-      setConfederacyURL(selectedValue);
+      setConfederacyURL(selectedValue)
     }
-  };
+  }
 
   const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
+    setNewOption('')
+    setOpenDialog(false)
+  }
 
   const handleAddOption = () => {
-    if (newOption.trim() !== '' && !constants.confederacyURLs.includes(newOption)) {
-      setConfederacyURLs(prevConfederacyURLs => [...prevConfederacyURLs, newOption]);
+    if (
+      newOption.trim() !== '' &&
+      !constants.confederacyURLs.includes(newOption)
+    ) {
+      setConfederacyURLs(prevConfederacyURLs => [
+        ...prevConfederacyURLs,
+        newOption
+      ])
       setConfederacyURL(newOption)
       setNewOption('')
       setOpenDialog(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleDownload}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Typography variant='h4'>Download Form</Typography>
-          <Typography color='textSecondary' paragraph>
+          <Typography variant="h4">Download Form</Typography>
+          <Typography color="textSecondary" paragraph>
             Download files from NanoStore
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <FormControl fullWidth variant='outlined'>
+          <FormControl fullWidth variant="outlined">
             <InputLabel>Confederacy Resolver URL</InputLabel>
             <Select
               value={confederacyURL}
               onChange={handleSelectChange}
-              label='Confederacy Resolver URL'
+              label="Confederacy Resolver URL"
             >
-              {confederacyURLs.map((url, index) => (
-                <MenuItem key={index} value={url.toString()}>
-                  {url.toString()}
-                </MenuItem>
-              ))}
-              <MenuItem value='add-new-option'>+ Add New Option</MenuItem>
+              {confederacyURLs.length === 0
+                ? (
+                <MenuItem disabled>No URLs available</MenuItem>
+                  )
+                : (
+                    confederacyURLs.map((url, index) => (
+                  <MenuItem key={index} value={url.toString()}>
+                    {url.toString()}
+                  </MenuItem>
+                    ))
+                  )}
+              <MenuItem value="add-new-option">+ Add New Option</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12}>
           <TextField
             fullWidth
-            variant='outlined'
-            label='UHRP URL'
+            variant="outlined"
+            label="UHRP URL"
             value={downloadURL}
-            onChange={(e) => setDownloadURL(e.target.value)}
+            onChange={e => setDownloadURL(e.target.value)}
           />
-          <Grid />
-
-          {/* Dialog for adding a new option */}
-          <Dialog open={openDialog} onClose={handleCloseDialog}>
-            <DialogTitle>Add a New Confederacy Resolver URL</DialogTitle>
-            <DialogContent>
-              <TextField
-                autoFocus
-                margin='dense'
-                label='URL'
-                type='text'
-                fullWidth
-                value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Cancel</Button>
-              <Button onClick={handleAddOption}>Add</Button>
-            </DialogActions>
-          </Dialog>
         </Grid>
+        {!inputsValid && (
+          <Grid item xs={12}>
+            <Typography color="error">
+              Please enter a valid UHRP URL.
+            </Typography>
+          </Grid>
+        )}
         <Grid item>
           <Button
-            variant='contained'
-            color='primary'
-            size='large'
-            type='submit'
+            aria-label="Download file"
+            variant="contained"
+            color="primary"
+            size="large"
+            type="submit"
             disabled={loading || !inputsValid}
             startIcon={<CloudDownload />}
           >
@@ -160,10 +166,27 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
             </Grid>
           )}
         </Grid>
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>Add a New Confederacy Resolver URL</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="URL"
+              type="text"
+              fullWidth
+              value={newOption}
+              onChange={e => setNewOption(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={handleAddOption}>Add</Button>
+          </DialogActions>
+        </Dialog>
       </Grid>
     </form>
-  );
-};
+  )
+}
 
-
-export default DownloadForm;
+export default DownloadForm

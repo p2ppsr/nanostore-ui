@@ -1,8 +1,8 @@
 interface Constants {
   confederacyURL: string
   nanostoreURL: string
-  confederacyURLs: string[] 
-  nanostoreURLs: string[]
+  confederacyURLs: readonly string[]
+  nanostoreURLs: readonly string[]
 }
 
 const confederacyLocalhostURL = 'http://localhost:3002'
@@ -17,14 +17,14 @@ const confederacyURLs = [
   confederacyLocalhostURL,
   confederacyDevStagingURL,
   confederacyProdURL
-]
+] as const
 
 // Used for Nanostore dropbox
 const nanostoreURLs = [
   nanostoreLocalURL,
   nanostoreDevStagingURL,
   nanostoreProdURL
-]
+] as const
 
 let constants: Constants
 
@@ -32,25 +32,28 @@ if (window.location.host.startsWith('localhost')) {
   // Local
   constants = {
     confederacyURL: confederacyLocalhostURL,
-    nanostoreURL:  nanostoreLocalURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    nanostoreURL: nanostoreLocalURL,
+    confederacyURLs,
+    nanostoreURLs
   }
-} else if (window.location.host.startsWith('staging') || process.env.NODE_ENV === 'development') {
+} else if (
+  window.location.host.startsWith('staging') ||
+  process.env.NODE_ENV === 'development'
+) {
   // Staging/Development
   constants = {
-    confederacyURL:  confederacyDevStagingURL,
-    nanostoreURL:  nanostoreDevStagingURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURL: confederacyDevStagingURL,
+    nanostoreURL: nanostoreDevStagingURL,
+    confederacyURLs,
+    nanostoreURLs
   }
 } else {
   // Production
   constants = {
     confederacyURL: confederacyProdURL,
     nanostoreURL: nanostoreProdURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    confederacyURLs,
+    nanostoreURLs
   }
 }
 
