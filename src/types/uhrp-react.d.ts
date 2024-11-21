@@ -1,1 +1,1 @@
-declare module 'uhrp-react';
+declare module 'uhrp-react'

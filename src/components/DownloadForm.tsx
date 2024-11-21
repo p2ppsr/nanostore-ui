@@ -1,4 +1,4 @@
-import React, { FormEvent, useState, useEffect, useRef } from 'react';
+import React, { type FormEvent, useState, useEffect } from 'react'
 import {
   Button,
   LinearProgress,
@@ -12,80 +12,80 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-} from '@mui/material';
-import { CloudDownload } from '@mui/icons-material';
-import { toast } from 'react-toastify';
-import { download } from 'nanoseek';
-import constants from '../utils/constants';
-import { SelectChangeEvent } from '@mui/material';
+  DialogActions
+} from '@mui/material'
+import { CloudDownload } from '@mui/icons-material'
+import { toast } from 'react-toastify'
+import { download } from 'nanoseek'
+import constants from '../utils/constants'
+import { type SelectChangeEvent } from '@mui/material'
 
-interface DownloadFormProps { }
-
-const DownloadForm: React.FC<DownloadFormProps> = () => {
-  const [confederacyURL, setConfederacyURL] = useState<string>('');
-  const [confederacyURLs, setConfederacyURLs] = useState<string[]>(constants.confederacyURLs.map(x => x.toString()));
-  const [downloadURL, setDownloadURL] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [inputsValid, setInputsValid] = useState<boolean>(false);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [newOption, setNewOption] = useState<string>('');
+const DownloadForm: React.FC = () => {
+  const [confederacyURL, setConfederacyURL] = useState<string>('')
+  const [confederacyURLs, setConfederacyURLs] = useState<string[]>(constants.confederacyURLs.map(x => x.toString()))
+  const [downloadURL, setDownloadURL] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [inputsValid, setInputsValid] = useState<boolean>(false)
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [newOption, setNewOption] = useState<string>('')
 
   useEffect(() => {
-    setInputsValid(confederacyURL.trim() !== '' && downloadURL.trim() !== '');
-  }, [confederacyURL, downloadURL]);
+    setInputsValid(confederacyURL.trim() !== '' && downloadURL.trim() !== '')
+  }, [confederacyURL, downloadURL])
 
   useEffect(() => {
-    if (constants.confederacyURLs && constants.confederacyURLs.length > 0) {
-      setConfederacyURL(constants.confederacyURLs[0].toString());
+    if (Array.isArray(constants.confederacyURLs) && constants.confederacyURLs.length > 0) {
+      setConfederacyURL(constants.confederacyURLs[0].toString())
     }
-  }, []);
+  }, [])
 
-  const handleDownload = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleDownload = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault()
+    setLoading(true)
     try {
-      const { mimeType, data } = await download({
-        UHRPUrl: downloadURL.trim() || '',
-        confederacyHost: confederacyURL.trim(),
-      });
-      const blob = new Blob([data], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = downloadURL.trim() || 'download';
+      if (downloadURL.trim() !== '') {
+        const { mimeType, data } = await download({
+          UHRPUrl: downloadURL.trim(),
+          confederacyHost: confederacyURL.trim()
+        })
+        const blob = new Blob([data], { type: mimeType })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = downloadURL.trim() !== '' ? downloadURL.trim() : 'download'
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
     } catch (error) {
-      toast.error('An error occurred during download');
+      toast.error('An error occurred during download')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    const selectedValue = event.target.value;
+  const handleSelectChange = (event: SelectChangeEvent<string>): void => {
+    const selectedValue = event.target.value
     if (selectedValue === 'add-new-option') {
-      setOpenDialog(true);
+      setOpenDialog(true)
     } else {
-      setConfederacyURL(selectedValue);
+      setConfederacyURL(selectedValue)
     }
-  };
+  }
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
+  const handleCloseDialog = (): void => {
+    setOpenDialog(false)
+  }
 
-  const handleAddOption = () => {
+  const handleAddOption = (): void => {
     if (newOption.trim() !== '' && !constants.confederacyURLs.includes(newOption)) {
-      setConfederacyURLs(prevConfederacyURLs => [...prevConfederacyURLs, newOption]);
+      setConfederacyURLs(prevConfederacyURLs => [...prevConfederacyURLs, newOption])
       setConfederacyURL(newOption)
       setNewOption('')
       setOpenDialog(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleDownload}>
@@ -119,11 +119,10 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
             variant='outlined'
             label='UHRP URL'
             value={downloadURL}
-            onChange={(e) => setDownloadURL(e.target.value)}
+            onChange={(e) => { setDownloadURL(e.target.value) }}
           />
           <Grid />
 
-          {/* Dialog for adding a new option */}
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>Add a New Confederacy Resolver URL</DialogTitle>
             <DialogContent>
@@ -134,7 +133,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
                 type='text'
                 fullWidth
                 value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
+                onChange={(e) => { setNewOption(e.target.value) }}
               />
             </DialogContent>
             <DialogActions>
@@ -162,8 +161,7 @@ const DownloadForm: React.FC<DownloadFormProps> = () => {
         </Grid>
       </Grid>
     </form>
-  );
-};
+  )
+}
 
-
-export default DownloadForm;
+export default DownloadForm
