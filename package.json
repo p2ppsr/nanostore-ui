@@ -6,6 +6,7 @@
   "dependencies": {
     "@babbage/react-prompt": "^0.2.20",
     "@babbage/sdk-ts": "^0.2.54",
+    "@bsv/sdk": "^1.4.2",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.6",
     "@packetpay/js": "^0.2.36",

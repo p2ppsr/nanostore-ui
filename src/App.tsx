@@ -41,7 +41,7 @@ const App: React.FC = () => {
         <ToastContainer />
         <Grid item xs={12}>
           <Typography variant='h4' align='center'>
-            NanoStore UI
+            UHRP Storage UI
           </Typography>
           <Typography color='textSecondary' paragraph align='center'>
             Upload and Download Content

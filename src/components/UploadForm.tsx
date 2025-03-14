@@ -17,20 +17,20 @@ import {
 } from '@mui/material'
 import { CloudUpload } from '@mui/icons-material'
 import { toast } from 'react-toastify'
-import { publishFile } from 'nanostore-publisher'
 import constants from '../utils/constants'
+import { StorageUploader, WalletClient } from '@bsv/sdk'
 
 interface UploadFormProps {}
 
 const UploadForm: React.FC<UploadFormProps> = () => {
-  const [nanostoreURL, setNanostoreURL] = useState<string>('')
-  const [nanostoreURLs, setNanostoreURLs] = useState<string[]>(constants.nanostoreURLs.map(x => x.toString()))
+  const [storageURL, setStorageURL] = useState<string>('')
+  const [storageURLs, setStorageURLs] = useState<string[]>(constants.storageURLs.map(x => x.toString()))
   const [hostingMinutes, setHostingMinutes] = useState<number>(180) // Default: 3 Hours (180 minutes)
   const [loading, setLoading] = useState<boolean>(false)
   const [file, setFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [isFormValid, setIsFormValid] = useState<boolean>(false)
-  const [results, setResults] = useState<{ hash: string; publicURL: string } | null>(
+  const [results, setResults] = useState<{ uhrpURL: string } | null>(
     null
   )
   const [actionTXID, setActionTXID] = useState('')
@@ -39,42 +39,44 @@ const UploadForm: React.FC<UploadFormProps> = () => {
   const [newOption, setNewOption] = useState<string>('')
 
   useEffect(() => {
-    setInputsValid(nanostoreURL.trim() !== '' && nanostoreURL.trim() !== '')
-  }, [nanostoreURL])
+    setInputsValid(storageURL.trim() !== '' && storageURL.trim() !== '')
+  }, [storageURL])
 
   useEffect(() => {
-    if (constants.nanostoreURLs && constants.nanostoreURLs.length > 0) {
-      setNanostoreURL(constants.nanostoreURLs[0].toString())
+    if (constants.storageURLs && constants.storageURLs.length > 0) {
+      setStorageURL(constants.storageURLs[0].toString())
     }
   }, [])
 
   useEffect(() => {
     setIsFormValid(
-      nanostoreURL.trim() !== '' && hostingMinutes >= 180 && file !== null
+      storageURL.trim() !== '' && hostingMinutes >= 180 && file !== null
     )
-  }, [nanostoreURL, hostingMinutes, file])
+  }, [storageURL, hostingMinutes, file])
 
   const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setActionTXID('')
     try {
-      const uploadResult = await publishFile({
-        config: {
-          nanostoreURL: nanostoreURL
-        },
-        file: file!,
+      const wallet = new WalletClient('auto', 'localhost')
+      const storageUploader = new StorageUploader({storageURL: 'https://nanostore.babbage.systems', wallet})
+      if (!file) {
+        throw new Error('No file was uploaded!')
+      }
+      debugger
+      const fileArrayBuffer = await file.arrayBuffer()
+      const data =  Array.from(new Uint8Array(fileArrayBuffer))
+      const uploadableFile = {data, type: file.type}
+    
+      const uploadResult = await storageUploader.publishFile({
+        file: uploadableFile,
         retentionPeriod: hostingMinutes,
-        progressTracker: (prog: ProgressEvent) => {
-          const progress = prog.total > 0 ? (prog.loaded / prog.total) * 100 : 0
-          setUploadProgress(progress)
-        }
       })
 
       // Handle upload success
       setResults({
-        hash: uploadResult.hash,
-        publicURL: uploadResult.publicURL
+        uhrpURL: uploadResult.uhrpURL
       })
 
     } catch (error) {
@@ -106,7 +108,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     if (selectedValue === 'add-new-option') {
       setOpenDialog(true)
     } else {
-      setNanostoreURL(selectedValue)
+      setStorageURL(selectedValue)
     }
   }
 
@@ -115,9 +117,9 @@ const UploadForm: React.FC<UploadFormProps> = () => {
   }
 
   const handleAddOption = () => {
-    if (newOption.trim() !== '' && !constants.nanostoreURLs.includes(newOption)) {
-      setNanostoreURLs(prevNanostoreURLs => [...prevNanostoreURLs, newOption])
-      setNanostoreURL(newOption)
+    if (newOption.trim() !== '' && !constants.storageURLs.includes(newOption)) {
+      setStorageURLs(prevStorageURLs => [...prevStorageURLs, newOption])
+      setStorageURL(newOption)
       setNewOption('')
       setOpenDialog(false)
     }
@@ -129,18 +131,18 @@ const UploadForm: React.FC<UploadFormProps> = () => {
         <Grid item xs={12}>
           <Typography variant='h4'>Upload Form</Typography>
           <Typography color='textSecondary' paragraph>
-            Upload files to NanoStore
+            Upload files to UHRP Storage
           </Typography>
         </Grid>
         <Grid item xs={12}>
           <FormControl fullWidth variant='outlined'>
-            <InputLabel>Nanostore Server URL</InputLabel>
+            <InputLabel>UHRP Storage Server URL</InputLabel>
             <Select
-              value={nanostoreURL}
+              value={storageURL}
               onChange={handleSelectChange}
-              label='Nanostore Server URL'
+              label='Storage Server URL'
             >
-              {nanostoreURLs.map((url, index) => (
+              {storageURLs.map((url, index) => (
                 <MenuItem key={index} value={url.toString()}>
                   {url.toString()}
                 </MenuItem>
@@ -226,11 +228,11 @@ const UploadForm: React.FC<UploadFormProps> = () => {
           <Grid item xs={12}>
             <Typography variant='h6'>Upload Successful!</Typography>
             <Typography><b>Payment TXID:</b>{' '}{actionTXID}</Typography>
-            <Typography variant='body1'><b>UHRP URL (can never change, works with all nodes):</b>{' '}{results.hash}</Typography>
+            <Typography variant='body1'><b>UHRP URL (can never change, works with all nodes):</b>{' '}{results.uhrpURL}</Typography>
             <Typography variant='body1'>
               <b>Legacy HTTPS URL (only for this node and commitment, may expire):</b>{' '}
-              <a href={results.publicURL} target='_blank' rel='noopener noreferrer'>
-                {results.publicURL}
+              <a href={results.uhrpURL} target='_blank' rel='noopener noreferrer'>
+                {results.uhrpURL}
               </a>
             </Typography>
           </Grid>

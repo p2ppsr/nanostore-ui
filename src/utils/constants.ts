@@ -1,16 +1,16 @@
 interface Constants {
   confederacyURL: string
-  nanostoreURL: string
+  storageURL: string
   confederacyURLs: string[] 
-  nanostoreURLs: string[]
+  storageURLs: string[]
 }
 
 const confederacyLocalhostURL = 'http://localhost:3002'
-const nanostoreLocalURL = 'http://localhost:3104'
-const confederacyDevStagingURL = 'https://staging-confederacy.babbage.systems'
-const nanostoreDevStagingURL = 'https://staging-nanostore.babbage.systems'
+const storageLocalURL = 'http://localhost:3104'
+const confederacyDevStagingURL = 'https://staging-confederacy.babbage.systems'// TODO CHANGE ALL OF THESE
+const storageDevStagingURL = 'https://staging-nanostore.babbage.systems'
 const confederacyProdURL = 'https://confederacy.babbage.systems'
-const nanostoreProdURL = 'https://nanostore.babbage.systems'
+const storageProdURL = 'https://nanostore.babbage.systems'
 
 // Used for Confederacy dropbox
 const confederacyURLs = [
@@ -20,10 +20,10 @@ const confederacyURLs = [
 ]
 
 // Used for Nanostore dropbox
-const nanostoreURLs = [
-  nanostoreLocalURL,
-  nanostoreDevStagingURL,
-  nanostoreProdURL
+const storageURLs = [
+  storageLocalURL,
+  storageDevStagingURL,
+  storageProdURL
 ]
 
 let constants: Constants
@@ -32,25 +32,25 @@ if (window.location.host.startsWith('localhost')) {
   // Local
   constants = {
     confederacyURL: confederacyLocalhostURL,
-    nanostoreURL:  nanostoreLocalURL,
+    storageURL:  storageLocalURL,
     confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    storageURLs: storageURLs
   }
 } else if (window.location.host.startsWith('staging') || process.env.NODE_ENV === 'development') {
   // Staging/Development
   constants = {
     confederacyURL:  confederacyDevStagingURL,
-    nanostoreURL:  nanostoreDevStagingURL,
+    storageURL:  storageDevStagingURL,
     confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    storageURLs: storageURLs
   }
 } else {
   // Production
   constants = {
     confederacyURL: confederacyProdURL,
-    nanostoreURL: nanostoreProdURL,
+    storageURL: storageProdURL,
     confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    storageURLs: storageURLs
   }
 }
 
