@@ -24,15 +24,16 @@ const NoMncModal: React.FC<NoMncModalProps> = ({ open, onClose }) => {
     <Modal
       open={open}
       onClose={onClose}
-      aria-labelledby='modal-modal-title'
-      aria-describedby='modal-modal-description'
+      // aria-labelledby='modal-modal-title'
+      // aria-describedby='modal-modal-description'
     >
       <Box sx={style} className='focusBorderNone'>
         <Typography id='modal-modal-title' variant='h6' component='h2'>
-          NanoStore requires the MetaNet Client
+          UHRP Storage requires the MetaNet Client
         </Typography>
         <Typography id='modal-modal-description' sx={{ mt: 2 }}>
           If you don't have it yet, it can be downloaded on{' '}
+          {/* TODO maybe change links after refactor*/}
           <a
             href='https://projectbabbage.com/desktop/res/MetaNet%20Client.exe'
             target='_blank'

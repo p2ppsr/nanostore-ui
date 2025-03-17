@@ -1,6 +1,4 @@
-import { getNetwork } from '@babbage/sdk-ts' // TODO
-
-export default async function checkForMetaNetClient() {
+export default async function checkForMetaNetClient() { // TODO Add new check for Metanet
   /*  try {
       const result = await getNetwork()
       if (result === 'mainnet' || result === 'testnet') {

@@ -1,55 +1,37 @@
 interface Constants {
-  confederacyURL: string
   storageURL: string
-  confederacyURLs: string[] 
   storageURLs: string[]
 }
 
-const confederacyLocalhostURL = 'http://localhost:3002'
-const storageLocalURL = 'http://localhost:3104'
-const confederacyDevStagingURL = 'https://staging-confederacy.babbage.systems'// TODO CHANGE ALL OF THESE
-const storageDevStagingURL = 'https://staging-nanostore.babbage.systems'
-const confederacyProdURL = 'https://confederacy.babbage.systems'
+// Local, Staging, and Production URLs for your storage
 const storageProdURL = 'https://nanostore.babbage.systems'
+const storageStagingURL = 'https://staging-nanostore.babbage.systems'
+const storageLocalURL = 'http://localhost:3104'
 
-// Used for Confederacy dropbox
-const confederacyURLs = [
-  confederacyLocalhostURL,
-  confederacyDevStagingURL,
-  confederacyProdURL
-]
-
-// Used for Nanostore dropbox
-const storageURLs = [
-  storageLocalURL,
-  storageDevStagingURL,
-  storageProdURL
-]
+// List of possible storage URLs (used for drop-downs, etc.)
+const storageURLs = [storageProdURL, storageStagingURL, storageLocalURL ]
 
 let constants: Constants
 
 if (window.location.host.startsWith('localhost')) {
   // Local
   constants = {
-    confederacyURL: confederacyLocalhostURL,
-    storageURL:  storageLocalURL,
-    confederacyURLs: confederacyURLs,
+    storageURL: storageLocalURL,
     storageURLs: storageURLs
   }
-} else if (window.location.host.startsWith('staging') || process.env.NODE_ENV === 'development') {
+} else if (
+  window.location.host.startsWith('staging') ||
+  process.env.NODE_ENV === 'development'
+) {
   // Staging/Development
   constants = {
-    confederacyURL:  confederacyDevStagingURL,
-    storageURL:  storageDevStagingURL,
-    confederacyURLs: confederacyURLs,
+    storageURL: storageStagingURL,
     storageURLs: storageURLs
   }
 } else {
   // Production
   constants = {
-    confederacyURL: confederacyProdURL,
     storageURL: storageProdURL,
-    confederacyURLs: confederacyURLs,
     storageURLs: storageURLs
   }
 }

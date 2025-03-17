@@ -1,4 +1,4 @@
-# NanoStore UI
+# UHRP Storage UI
 
 Upload and Download Content
 

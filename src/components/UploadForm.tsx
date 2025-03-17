@@ -30,9 +30,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
   const [file, setFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [isFormValid, setIsFormValid] = useState<boolean>(false)
-  const [results, setResults] = useState<{ uhrpURL: string } | null>(
-    null
-  )
+  const [results, setResults] = useState<{ uhrpURL: string } | null>(null)
   const [actionTXID, setActionTXID] = useState('')
   const [inputsValid, setInputsValid] = useState<boolean>(false)
   const [openDialog, setOpenDialog] = useState<boolean>(false)
@@ -60,27 +58,42 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     setActionTXID('')
     try {
       const wallet = new WalletClient('auto', 'localhost')
-      const storageUploader = new StorageUploader({storageURL: 'https://nanostore.babbage.systems', wallet})
+      const storageUploader = new StorageUploader({
+        storageURL,
+        wallet
+      })
+
       if (!file) {
         throw new Error('No file was uploaded!')
       }
-      debugger
-      const fileArrayBuffer = await file.arrayBuffer()
-      const data =  Array.from(new Uint8Array(fileArrayBuffer))
-      const uploadableFile = {data, type: file.type}
-    
+
+      // Read file into an ArrayBuffer:
+      let fileArrayBuffer: ArrayBuffer | null = null
+      try {
+        fileArrayBuffer = await file.arrayBuffer()
+      } catch (err) {
+        console.error('ERROR reading the file:', err)
+      }
+
+      if (!fileArrayBuffer) {
+        throw new Error('Could not read file array buffer.')
+      }
+      // Turn the array buffer into a normal number array
+      const data = Array.from(new Uint8Array(fileArrayBuffer))
+      const uploadableFile = { data, type: file.type }
+
+      // Publish the file using the StorageUploader
       const uploadResult = await storageUploader.publishFile({
         file: uploadableFile,
-        retentionPeriod: hostingMinutes,
+        retentionPeriod: hostingMinutes
       })
 
       // Handle upload success
       setResults({
         uhrpURL: uploadResult.uhrpURL
       })
-
-    } catch (error) {
-      console.error(error)
+    } catch (err) {
+      console.error('Upload failed:', err)
       toast.error('Upload failed')
     } finally {
       setLoading(false)
@@ -184,7 +197,6 @@ const UploadForm: React.FC<UploadFormProps> = () => {
           <input type='file' name='file' onChange={handleFileChange} />
         </Grid>
         <Grid item xs={12}>
-          {/* Dialog for adding a new option */}
           <Dialog open={openDialog} onClose={handleCloseDialog}>
             <DialogTitle>Add a New Server URL</DialogTitle>
             <DialogContent>
@@ -195,7 +207,7 @@ const UploadForm: React.FC<UploadFormProps> = () => {
                 type='text'
                 fullWidth
                 value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
+                onChange={e => setNewOption(e.target.value)}
               />
             </DialogContent>
             <DialogActions>
@@ -227,8 +239,12 @@ const UploadForm: React.FC<UploadFormProps> = () => {
         {results && (
           <Grid item xs={12}>
             <Typography variant='h6'>Upload Successful!</Typography>
-            <Typography><b>Payment TXID:</b>{' '}{actionTXID}</Typography>
-            <Typography variant='body1'><b>UHRP URL (can never change, works with all nodes):</b>{' '}{results.uhrpURL}</Typography>
+            <Typography>
+              <b>Payment TXID:</b> {actionTXID}
+            </Typography>
+            <Typography variant='body1'>
+              <b>UHRP URL (can never change, works with all nodes):</b> {results.uhrpURL}
+            </Typography>
             <Typography variant='body1'>
               <b>Legacy HTTPS URL (only for this node and commitment, may expire):</b>{' '}
               <a href={results.uhrpURL} target='_blank' rel='noopener noreferrer'>
