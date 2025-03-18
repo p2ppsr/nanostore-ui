@@ -57,8 +57,6 @@ const UploadForm: React.FC<UploadFormProps> = () => {
     setLoading(true)
     setActionTXID('')
     try {
-
-      debugger
       const wallet = new WalletClient('auto', 'localhost')
       const storageUploader = new StorageUploader({
         storageURL,
@@ -84,7 +82,6 @@ const UploadForm: React.FC<UploadFormProps> = () => {
       const data = Array.from(new Uint8Array(fileArrayBuffer))
       const uploadableFile = { data, size: data.length, type: file.type }
 
-      debugger
       // Publish the file using the StorageUploader
       const uploadResult = await storageUploader.publishFile({
         file: uploadableFile,
