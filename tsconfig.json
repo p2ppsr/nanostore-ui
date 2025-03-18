@@ -15,7 +15,8 @@
     "isolatedModules": true,
     "noEmit": false,  // Changed to false
     "jsx": "react",
-    "sourceMap": true // Optional, but recommended for development
+    "sourceMap": true,
+    "outDir": "build"
   },
   "include": ["src", "src/components", "src/utils", "src/types"]
 }
