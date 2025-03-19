@@ -1,56 +1,38 @@
 interface Constants {
-  confederacyURL: string
-  nanostoreURL: string
-  confederacyURLs: string[] 
-  nanostoreURLs: string[]
+  storageURL: string
+  storageURLs: string[]
 }
 
-const confederacyLocalhostURL = 'http://localhost:3002'
-const nanostoreLocalURL = 'http://localhost:3104'
-const confederacyDevStagingURL = 'https://staging-confederacy.babbage.systems'
-const nanostoreDevStagingURL = 'https://staging-nanostore.babbage.systems'
-const confederacyProdURL = 'https://confederacy.babbage.systems'
-const nanostoreProdURL = 'https://nanostore.babbage.systems'
+// Local, Staging, and Production URLs for your storage
+const storageProdURL = 'https://nanostore.babbage.systems'
+const storageStagingURL = 'https://staging-nanostore.babbage.systems'
+const storageLocalURL = 'http://localhost:3104'
 
-// Used for Confederacy dropbox
-const confederacyURLs = [
-  confederacyLocalhostURL,
-  confederacyDevStagingURL,
-  confederacyProdURL
-]
-
-// Used for Nanostore dropbox
-const nanostoreURLs = [
-  nanostoreLocalURL,
-  nanostoreDevStagingURL,
-  nanostoreProdURL
-]
+// List of possible storage URLs (used for drop-downs, etc.)
+const storageURLs = [storageProdURL, storageStagingURL, storageLocalURL ]
 
 let constants: Constants
 
 if (window.location.host.startsWith('localhost')) {
   // Local
   constants = {
-    confederacyURL: confederacyLocalhostURL,
-    nanostoreURL:  nanostoreLocalURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    storageURL: storageLocalURL,
+    storageURLs: storageURLs
   }
-} else if (window.location.host.startsWith('staging') || process.env.NODE_ENV === 'development') {
+} else if (
+  window.location.host.startsWith('staging') ||
+  process.env.NODE_ENV === 'development'
+) {
   // Staging/Development
   constants = {
-    confederacyURL:  confederacyDevStagingURL,
-    nanostoreURL:  nanostoreDevStagingURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    storageURL: storageStagingURL,
+    storageURLs: storageURLs
   }
 } else {
   // Production
   constants = {
-    confederacyURL: confederacyProdURL,
-    nanostoreURL: nanostoreProdURL,
-    confederacyURLs: confederacyURLs,
-    nanostoreURLs: nanostoreURLs
+    storageURL: storageProdURL,
+    storageURLs: storageURLs
   }
 }
 

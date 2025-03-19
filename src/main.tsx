@@ -6,7 +6,6 @@ import App from './App'
 import web3Theme from './theme'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { MNCErrorHandlerProvider } from 'metanet-react-prompt'
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
