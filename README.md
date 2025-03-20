@@ -1,7 +1,5 @@
-# UHRP Storage UI
+# DEPRECATED
 
-Upload and Download Content
+This code has been deprecated and is no longer maintained.
 
-## License
-
-The license for the code in this repository is the Open BSV License.
+Please use [UHRP UI](https://github.com/bitcoin-sv/uhrp-ui) instead.
